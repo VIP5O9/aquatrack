@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Cloud, CloudOff, LogOut, Loader2, MailCheck, Store, UserPlus, Copy, Check, X, KeyRound } from 'lucide-react'
 import Pastille from './Pastille.jsx'
 import { ChampTexte } from './Champs.jsx'
-import { GroupeReglage } from './LigneReglage.jsx'
+import { GroupeReglage, ChipIcone } from './LigneReglage.jsx'
+import { ChevronRight } from 'lucide-react'
 import { useStore } from '../store/useStore.js'
 import {
   connecter,
@@ -57,7 +58,7 @@ export default function SectionCompte() {
   if (!supabaseConfigure) {
     return (
       <GroupeReglage titre="Sauvegarde en ligne">
-        <div className="p-4">
+        <div className="px-3.5 py-4">
           <p className="sous-ligne mb-4">
             Non configurée. Vos données vivent uniquement sur cet appareil.
           </p>
@@ -95,17 +96,16 @@ export default function SectionCompte() {
   /* --- Connecte ---------------------------------------------------------- */
   if (session) {
     return (
-      <GroupeReglage titre="Sauvegarde en ligne">
-        <div className="p-4">
-        <p className="sous-ligne mb-4">
-          Vos données sont copiées sur le serveur au fil de vos saisies.
-        </p>
-
+      <GroupeReglage
+        titre="Sauvegarde en ligne"
+        aide="Vos données sont copiées sur le serveur au fil de vos saisies. Se déconnecter n’efface rien : l’application continue en local, seule la sauvegarde s’arrête."
+      >
+        {/* Statut du compte */}
         <div
-          className="flex items-center gap-3 rounded-[14px] px-4 py-3"
-          style={{ background: 'var(--surface-doux)' }}
+          className="flex items-center gap-3 px-3.5 py-3"
+          style={{ borderBottom: '1px solid var(--bordure)' }}
         >
-          <Cloud size={17} strokeWidth={1.75} style={{ color: 'var(--vert)' }} />
+          <ChipIcone icone={Cloud} couleur="var(--vert)" />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm">{session.user?.email}</span>
             <span className="sous-ligne block">
@@ -116,13 +116,16 @@ export default function SectionCompte() {
           </span>
         </div>
 
-        <BlocKiosque
-          kiosque={kiosque}
-          membres={membres}
-          emailCourant={session.user?.email}
-          idCourant={session.user?.id}
-          onChange={rafraichirKiosque}
-        />
+        {/* Kiosque partagé */}
+        <div className="px-3.5 py-3" style={{ borderBottom: '1px solid var(--bordure)' }}>
+          <BlocKiosque
+            kiosque={kiosque}
+            membres={membres}
+            emailCourant={session.user?.email}
+            idCourant={session.user?.id}
+            onChange={rafraichirKiosque}
+          />
+        </div>
 
         <ChangementMotDePasse />
 
@@ -158,24 +161,19 @@ export default function SectionCompte() {
             setOccupe(false)
           }}
           disabled={occupe}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-[13px] disabled:opacity-50"
-          style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
+          className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] disabled:opacity-50"
         >
-          <LogOut size={15} strokeWidth={1.75} />
-          Se déconnecter
+          <ChipIcone icone={LogOut} danger />
+          <span className="text-sm" style={{ color: 'var(--rouge)' }}>
+            Se déconnecter
+          </span>
         </button>
 
         {message && (
-          <div className="mt-4">
+          <div className="px-3.5 pt-1 pb-3.5">
             <Pastille bloc>{message}</Pastille>
           </div>
         )}
-
-        <p className="sous-ligne mt-4">
-          Se déconnecter n’efface rien : l’application continue de fonctionner en local,
-          seule la sauvegarde s’arrête.
-        </p>
-        </div>
       </GroupeReglage>
     )
   }
@@ -183,7 +181,7 @@ export default function SectionCompte() {
   /* --- Configure, deconnecte --------------------------------------------- */
   return (
     <GroupeReglage titre="Sauvegarde en ligne">
-      <div className="p-4">
+      <div className="px-3.5 py-4">
       <p className="sous-ligne mb-4">
         Connectez-vous pour sauvegarder vos données hors de ce téléphone.
       </p>
@@ -210,7 +208,7 @@ export default function SectionCompte() {
         <button
           onClick={soumettre}
           disabled={occupe}
-          className="flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-medium disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
           style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
         >
           {occupe && <Loader2 size={16} className="animate-spin" />}
@@ -322,11 +320,12 @@ function ChangementMotDePasse() {
     return (
       <button
         onClick={() => setOuvert(true)}
-        className="mt-3 flex w-full items-center gap-2.5 rounded-[14px] px-4 py-3 text-left text-[13px]"
-        style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
+        className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+        style={{ borderBottom: '1px solid var(--bordure)' }}
       >
-        <KeyRound size={15} strokeWidth={1.75} />
-        Changer le mot de passe
+        <ChipIcone icone={KeyRound} />
+        <span className="flex-1 text-sm">Changer le mot de passe</span>
+        <ChevronRight size={17} strokeWidth={2} style={{ color: 'var(--texte-tres-doux)' }} />
       </button>
     )
   }
@@ -339,15 +338,15 @@ function ChangementMotDePasse() {
       onChange={(e) => set(e.target.value)}
       onKeyDown={(e) => e.key === 'Enter' && soumettre()}
       placeholder={ph}
-      className="w-full rounded-[12px] px-3.5 py-2.5 text-sm outline-none"
-      style={{ background: 'var(--surface)', border: '1px solid var(--bordure)' }}
+      className="w-full rounded-[12px] px-3.5 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+      style={{ background: 'var(--surface-doux)' }}
     />
   )
 
   return (
     <div
-      className="mt-3 flex flex-col gap-2.5 rounded-[14px] p-4"
-      style={{ background: 'var(--surface-doux)' }}
+      className="flex flex-col gap-2.5 px-3.5 py-3.5"
+      style={{ borderBottom: '1px solid var(--bordure)' }}
     >
       <p className="text-[13px] font-medium">Changer le mot de passe</p>
 
@@ -370,7 +369,7 @@ function ChangementMotDePasse() {
           <button
             onClick={soumettre}
             disabled={occupe || !actuel || !nouveau || !confirme}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
             style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
           >
             {occupe && <Loader2 size={15} className="animate-spin" />}
@@ -379,8 +378,8 @@ function ChangementMotDePasse() {
         )}
         <button
           onClick={fermer}
-          className="flex-1 rounded-full py-2.5 text-[13px]"
-          style={{ background: 'var(--surface)', color: 'var(--texte-doux)' }}
+          className="flex-1 rounded-full py-2.5 text-[13px] transition-colors outline-none hover:brightness-95 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+          style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
         >
           {fait ? 'Fermer' : 'Annuler'}
         </button>
@@ -418,7 +417,7 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
   /* --- Pas encore de kiosque --------------------------------------------- */
   if (!kiosque) {
     return (
-      <div className="mt-4">
+      <div>
         <Pastille bloc>
           Votre compte n’est rattaché à aucun kiosque. Créez le vôtre, ou rejoignez celui
           de votre patron avec son code.
@@ -498,7 +497,7 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
 
   /* --- Kiosque actif ------------------------------------------------------ */
   return (
-    <div className="mt-4">
+    <div>
       <div className="flex items-center gap-2.5">
         <Store size={16} strokeWidth={1.75} style={{ color: 'var(--texte-doux)' }} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{kiosque.nom}</span>

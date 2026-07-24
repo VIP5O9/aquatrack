@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import EnTete from '../components/EnTete.jsx'
 import SegmentPills from '../components/SegmentPills.jsx'
+import Pastille from '../components/Pastille.jsx'
 import SectionSecurite from '../components/SectionSecurite.jsx'
 import SectionCompte from '../components/SectionCompte.jsx'
 import ListeReordonnable from '../components/ListeReordonnable.jsx'
@@ -78,7 +79,10 @@ export default function Reglages() {
     <>
       <EnTete titre="Réglages" avecAjout={false} />
 
-      <div className="mx-auto flex max-w-[600px] flex-col gap-6">
+      {/* Colonne calee sur le bord gauche du titre — la coquille centre deja a
+          1280px, un second `mx-auto` orphelinait l'en-tete. `reglages` porte
+          aussi le rehaussement de contraste local du texte discret. */}
+      <div className="reglages flex max-w-[640px] flex-col gap-6">
         {/* ---- Kiosque : identité et tarifs ---------------------------- */}
         <GroupeReglage
           titre="Votre kiosque"
@@ -188,7 +192,7 @@ export default function Reglages() {
           titre="Apparence"
           aide="« Système » suit le réglage de votre téléphone et bascule tout seul le soir."
         >
-          <div className="p-3">
+          <div className="px-3.5 py-3">
             <SegmentPills
               valeur={themeMode}
               onChange={changerTheme}
@@ -257,9 +261,9 @@ export default function Reglages() {
         </GroupeReglage>
 
         {message && (
-          <p className="px-1 text-sm" style={{ color: 'var(--texte)' }}>
-            {message}
-          </p>
+          <div className="px-1">
+            <Pastille bloc>{message}</Pastille>
+          </div>
         )}
       </div>
     </>
@@ -303,7 +307,7 @@ function LigneCategorie({
           au doigt, et rater la poignee fait defiler la page a la place. */}
       <span
         {...poignee}
-        className="-m-2 grid size-9 shrink-0 place-items-center rounded-lg outline-none focus-visible:ring-2"
+        className="-m-2 grid size-9 shrink-0 place-items-center rounded-lg outline-none transition-colors hover:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         style={{ ...poignee?.style, color: 'var(--texte-tres-doux)' }}
       >
         <GripVertical size={16} />
@@ -315,7 +319,7 @@ function LigneCategorie({
           const i = PALETTE.indexOf(categorie.color)
           onEnregistrer({ ...categorie, color: PALETTE[(i + 1) % PALETTE.length] })
         }}
-        className="size-4 shrink-0 rounded-full"
+        className="size-4 shrink-0 rounded-full outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
         style={{ background: categorie.color, outline: '1px solid rgb(0 0 0 / .08)' }}
       />
 
@@ -339,8 +343,7 @@ function LigneCategorie({
         <button
           onClick={onSupprimer}
           aria-label={`Supprimer ${categorie.nom}`}
-          className="shrink-0 p-1"
-          style={{ color: 'var(--texte-tres-doux)' }}
+          className="shrink-0 rounded-lg p-1 text-[var(--texte-tres-doux)] transition-colors outline-none hover:text-[var(--rouge)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Trash2 size={15} />
         </button>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Lock, Fingerprint, ShieldCheck } from 'lucide-react'
 import Pastille from './Pastille.jsx'
-import { GroupeReglage, Interrupteur } from './LigneReglage.jsx'
+import { GroupeReglage, Interrupteur, ChipIcone } from './LigneReglage.jsx'
 import SegmentPills from './SegmentPills.jsx'
 import { useStore, useEtat } from '../store/useStore.js'
 import { DELAIS, biometrieDisponible, enrolerBiometrie, verifierCode } from '../lib/verrou.js'
@@ -92,7 +92,7 @@ export default function SectionSecurite() {
       titre="Sécurité"
       aide="Ce verrou protège contre quelqu'un qui prend le téléphone en main. Il ne chiffre pas vos données : gardez aussi le téléphone protégé par le verrouillage du système."
     >
-      <div className="p-4">
+      <div className="px-3.5 py-4">
       <p className="sous-ligne mb-4">
         Un code à 4 chiffres à l'ouverture, pour que le téléphone posé sur le comptoir ne
         laisse pas voir vos chiffres.
@@ -110,20 +110,20 @@ export default function SectionSecurite() {
         ) : (
           <button
             onClick={() => setEtape('nouveau')}
-            className="flex w-full items-center gap-3 rounded-[14px] px-4 py-3 text-left text-sm"
+            className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
             style={{ background: 'var(--surface-doux)' }}
           >
-            <Lock size={17} strokeWidth={1.75} style={{ color: 'var(--texte-doux)' }} />
+            <ChipIcone icone={Lock} />
             Activer le verrouillage
           </button>
         )
       ) : (
         <div className="flex flex-col gap-5">
           <div
-            className="flex items-center gap-2.5 rounded-[14px] px-4 py-3 text-sm"
+            className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm"
             style={{ background: 'var(--surface-doux)' }}
           >
-            <ShieldCheck size={17} strokeWidth={1.75} style={{ color: 'var(--vert)' }} />
+            <ChipIcone icone={ShieldCheck} couleur="var(--vert)" />
             Verrouillage actif
           </div>
 
@@ -173,8 +173,7 @@ export default function SectionSecurite() {
           ) : (
             <button
               onClick={() => setEtape('retirer')}
-              className="self-start text-[13px] underline underline-offset-2"
-              style={{ color: 'var(--texte-doux)' }}
+              className="self-start rounded text-[13px] text-[var(--texte-doux)] underline underline-offset-2 transition-colors outline-none hover:text-[var(--rouge)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               Désactiver le verrouillage
             </button>
@@ -215,15 +214,14 @@ function SaisieCode({ titre, saisie, onChange, onValider, onAnnuler }) {
         <button
           onClick={onValider}
           disabled={saisie.length !== 4}
-          className="rounded-[14px] px-4 text-sm font-medium disabled:opacity-40"
+          className="rounded-[14px] px-4 text-sm font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-40"
           style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
         >
           Valider
         </button>
         <button
           onClick={onAnnuler}
-          className="px-2 text-[13px]"
-          style={{ color: 'var(--texte-doux)' }}
+          className="rounded px-2 text-[13px] text-[var(--texte-doux)] transition-colors outline-none hover:text-[var(--texte)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           Annuler
         </button>

@@ -234,6 +234,17 @@ input[inputmode='numeric'],
   }
 }
 
+/* Reglages : le texte discret y est plus dense qu'ailleurs (notes d'aide,
+   intertitres, sous-titres empiles). A 50 % d'encre il tombait a 3,2:1 sur le
+   fond clair — sous le seuil AA. On remonte le jeton LOCALEMENT, pour ce seul
+   ecran et le seul theme clair : le sombre passe deja (5,3:1), et les autres
+   ecrans, moins charges, ne sont pas touches. Les proprietes custom heritant,
+   tout `var(--texte-doux)` sous `.reglages` se corrige d'un coup. */
+:root:not([data-theme='dark']) .reglages {
+  --texte-doux: rgb(34 32 38 / 0.64); /* 3,2:1 → 4,6:1 */
+  --texte-tres-doux: rgb(34 32 38 / 0.5); /* chevrons, corbeille : ~3:1 */
+}
+
 /* Code faux : une secousse breve dit « recommencez » sans texte a lire. */
 @keyframes secousse {
   0%,

@@ -15,6 +15,29 @@ import { lireNombre } from '../lib/format.js'
  * rend l'ecran previsible : on sait ou toucher avant d'avoir lu.
  */
 
+/**
+ * La chip d'icone : un carre doux de 32px, icone en encre discrete. C'est le
+ * marqueur visuel de la grammaire de reglages — partage entre les lignes et les
+ * sections (Compte, Securite) pour que les icones parlent le meme langage
+ * partout, plutot qu'une icone nue ici et une chip la.
+ */
+export function ChipIcone({ icone: Icone, danger = false, couleur }) {
+  if (!Icone) return null
+  return (
+    <span
+      className="grid size-8 shrink-0 place-items-center rounded-[9px]"
+      style={{
+        background: danger
+          ? 'color-mix(in srgb, var(--rouge) 14%, transparent)'
+          : 'var(--surface-doux)',
+        color: danger ? 'var(--rouge)' : (couleur ?? 'var(--texte-doux)'),
+      }}
+    >
+      <Icone size={16.5} strokeWidth={1.75} />
+    </span>
+  )
+}
+
 /** Une carte de groupe : intertitre, lignes, et note de bas de groupe. */
 export function GroupeReglage({ titre, children, aide }) {
   return (
@@ -59,23 +82,13 @@ export function LigneReglage({
     <Comp
       onClick={onClick}
       className={`flex w-full items-center gap-3 px-3.5 py-3 text-left [&:not(:last-child)]:border-b ${
-        onClick ? 'transition-colors active:bg-[var(--surface-doux)]' : ''
+        onClick
+          ? 'transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]'
+          : ''
       }`}
       style={{ borderColor: 'var(--bordure)' }}
     >
-      {Icone && (
-        <span
-          className="grid size-8 shrink-0 place-items-center rounded-[9px]"
-          style={{
-            background: danger
-              ? 'color-mix(in srgb, var(--rouge) 14%, transparent)'
-              : 'var(--surface-doux)',
-            color: danger ? 'var(--rouge)' : 'var(--texte-doux)',
-          }}
-        >
-          <Icone size={16.5} strokeWidth={1.75} />
-        </span>
-      )}
+      <ChipIcone icone={Icone} danger={danger} />
 
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm" style={{ color: encre }}>
@@ -180,7 +193,7 @@ export function Interrupteur({ actif, onChange }) {
       role="switch"
       aria-checked={actif}
       onClick={() => onChange(!actif)}
-      className="relative h-7 w-12 shrink-0 rounded-full transition-colors"
+      className="relative h-7 w-12 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
       style={{ background: actif ? 'var(--accent)' : 'var(--gris-data)' }}
     >
       <span
