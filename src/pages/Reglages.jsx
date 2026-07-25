@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Download, Upload, RotateCcw, Trash2, Plus, GripVertical,
   Coins, Truck, Gauge, Ruler, User, BellRing, Clock,
+  Store, Palette, Cloud, ShieldCheck, Database,
 } from 'lucide-react'
 import EnTete from '../components/EnTete.jsx'
 import SegmentPills from '../components/SegmentPills.jsx'
@@ -21,6 +22,25 @@ import { notificationsDisponibles, demanderPermission } from '../lib/notificatio
 
 const PALETTE = ['#222026', '#2672DD', '#22D3F5', '#E4E4E6']
 
+/**
+ * Suit une media query. Sert à choisir la forme des réglages sans dupliquer
+ * leur contenu : un maître-détail sur grand écran, une pile unique sur
+ * téléphone. `1024px` est le point où la barre latérale de l'app apparaît.
+ */
+function useMediaQuery(query) {
+  const [match, setMatch] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia ? window.matchMedia(query).matches : false,
+  )
+  useEffect(() => {
+    const m = window.matchMedia(query)
+    const surChangement = () => setMatch(m.matches)
+    surChangement()
+    m.addEventListener('change', surChangement)
+    return () => m.removeEventListener('change', surChangement)
+  }, [query])
+  return match
+}
+
 export default function Reglages() {
   const etat = useEtat()
   const majReglages = useStore((s) => s.majReglages)
@@ -36,6 +56,12 @@ export default function Reglages() {
 
   const fichier = useRef(null)
   const [message, setMessage] = useState(null)
+
+  // Grand écran : un rail de catégories à gauche, le contenu à droite. Sous
+  // 1024px on retombe sur la pile unique — le téléphone n'a pas la place d'un
+  // maître-détail, et c'est la surface principale.
+  const desktop = useMediaQuery('(min-width: 1024px)')
+  const [onglet, setOnglet] = useState('kiosque')
 
   const r = etat.reglages
   const nbRecus = etat.recus.length
@@ -75,119 +101,129 @@ export default function Reglages() {
         r.prix_vente_gallon,
       )}/gallon) — ce n’est pas une mesure, elle ne révèle ni fuite ni manquant.`
 
-  return (
-    <>
-      <EnTete titre="Réglages" avecAjout={false} />
-
-      {/* Colonne calee sur le bord gauche du titre — la coquille centre deja a
-          1280px, un second `mx-auto` orphelinait l'en-tete. `reglages` porte
-          aussi le rehaussement de contraste local du texte discret. */}
-      <div className="reglages flex max-w-[640px] flex-col gap-6">
-        {/* ---- Kiosque : identité et tarifs ---------------------------- */}
-        <GroupeReglage
-          titre="Votre kiosque"
-          aide="Le prix sert à déduire les gallons vendus du montant encaissé. Le changer ne vaut que pour les journées à venir ; celles déjà clôturées gardent leur prix."
-        >
-          <LigneReglage
-            icone={User}
-            titre="Votre nom"
-            trailing={
-              <ValeurTexte
-                valeur={r.nom_utilisateur}
-                onValider={(v) => majReglages({ nom_utilisateur: v })}
-                placeholder="Ex : Dawensky"
-              />
-            }
-          />
-          <LigneReglage
-            icone={Coins}
-            titre="Prix de vente / gallon"
-            trailing={
-              <ValeurNombre
-                valeur={r.prix_vente_gallon}
-                unite="HTG"
-                onValider={(n) => majReglages({ prix_vente_gallon: n })}
-              />
-            }
-          />
-          <LigneReglage
-            icone={Truck}
-            titre="Capacité d'un camion"
-            trailing={
-              <ValeurNombre
-                valeur={r.capacite_camion}
-                unite="gal"
-                onValider={(n) => majReglages({ capacite_camion: n })}
-              />
-            }
-          />
-        </GroupeReglage>
-
-        {/* ---- Compteur ------------------------------------------------ */}
-        <GroupeReglage titre="Compteur d'eau" aide={modeleCompteur}>
-          <LigneReglage
-            icone={Gauge}
-            titre="J'ai un compteur d'eau"
-            sousTitre="Mesure réelle des gallons débités"
-            trailing={
-              <Interrupteur
-                actif={r.compteur_actif}
-                onChange={(v) => majReglages({ compteur_actif: v })}
-              />
-            }
-          />
-          {r.compteur_actif && (
+  /**
+   * Les catégories du panneau. Chacune porte son icône (pour le rail) et son
+   * contenu (pour le panneau). Le MÊME `rendu` sert au maître-détail du desktop
+   * et à la pile du mobile — aucune duplication.
+   */
+  const categories = [
+    {
+      id: 'kiosque',
+      libelle: 'Kiosque',
+      icone: Store,
+      rendu: () => (
+        <>
+          {/* Identité et tarifs */}
+          <GroupeReglage
+            titre="Votre kiosque"
+            aide="Le prix sert à déduire les gallons vendus du montant encaissé. Le changer ne vaut que pour les journées à venir ; celles déjà clôturées gardent leur prix."
+          >
             <LigneReglage
-              icone={Ruler}
-              titre="Index de départ"
-              sousTitre="Le relevé actuel du compteur"
+              icone={User}
+              titre="Votre nom"
               trailing={
-                <ValeurNombre
-                  valeur={r.compteur_index_initial}
-                  unite="gal"
-                  min={-1}
-                  onValider={(n) => majReglages({ compteur_index_initial: n })}
+                <ValeurTexte
+                  valeur={r.nom_utilisateur}
+                  onValider={(v) => majReglages({ nom_utilisateur: v })}
+                  placeholder="Ex : Dawensky"
                 />
               }
             />
-          )}
-        </GroupeReglage>
-
-        {/* ---- Categories de depenses ---------------------------------- */}
-        <GroupeReglage titre="Catégories de dépenses" aide="Touchez la pastille pour changer la couleur, glissez la poignée pour l'ordre.">
-          <div className="px-2 py-1">
-            <ListeReordonnable items={etat.categories} onReordonner={reordonnerCategories}>
-              {(c, { poignee, enDeplacement }) => (
-                <LigneCategorie
-                  categorie={c}
-                  poignee={poignee}
-                  enDeplacement={enDeplacement}
-                  onEnregistrer={enregistrerCategorie}
-                  onSupprimer={() => supprimerLigne('categories', c.id)}
-                  supprimable={etat.categories.length > 1}
+            <LigneReglage
+              icone={Coins}
+              titre="Prix de vente / gallon"
+              trailing={
+                <ValeurNombre
+                  valeur={r.prix_vente_gallon}
+                  unite="HTG"
+                  onValider={(n) => majReglages({ prix_vente_gallon: n })}
                 />
-              )}
-            </ListeReordonnable>
-          </div>
-          <LigneReglage
-            icone={Plus}
-            titre="Ajouter une catégorie"
-            onClick={() =>
-              enregistrerCategorie({
-                nom: 'Nouvelle catégorie',
-                color: PALETTE[etat.categories.length % PALETTE.length],
-                unit: 'montant',
-                suit_gallons: false,
-                position: etat.categories.length,
-              })
-            }
-          />
-        </GroupeReglage>
+              }
+            />
+            <LigneReglage
+              icone={Truck}
+              titre="Capacité d'un camion"
+              trailing={
+                <ValeurNombre
+                  valeur={r.capacite_camion}
+                  unite="gal"
+                  onValider={(n) => majReglages({ capacite_camion: n })}
+                />
+              }
+            />
+          </GroupeReglage>
 
-        {/* ---- Rappel de cloture --------------------------------------- */}
-        <CarteRappel reglages={r} majReglages={majReglages} />
+          {/* Compteur */}
+          <GroupeReglage titre="Compteur d'eau" aide={modeleCompteur}>
+            <LigneReglage
+              icone={Gauge}
+              titre="J'ai un compteur d'eau"
+              sousTitre="Mesure réelle des gallons débités"
+              trailing={
+                <Interrupteur
+                  actif={r.compteur_actif}
+                  onChange={(v) => majReglages({ compteur_actif: v })}
+                />
+              }
+            />
+            {r.compteur_actif && (
+              <LigneReglage
+                icone={Ruler}
+                titre="Index de départ"
+                sousTitre="Le relevé actuel du compteur"
+                trailing={
+                  <ValeurNombre
+                    valeur={r.compteur_index_initial}
+                    unite="gal"
+                    min={-1}
+                    onValider={(n) => majReglages({ compteur_index_initial: n })}
+                  />
+                }
+              />
+            )}
+          </GroupeReglage>
 
-        {/* ---- Apparence ----------------------------------------------- */}
+          {/* Catégories de dépenses */}
+          <GroupeReglage
+            titre="Catégories de dépenses"
+            aide="Touchez la pastille pour changer la couleur, glissez la poignée pour l'ordre."
+          >
+            <div className="px-2 py-1">
+              <ListeReordonnable items={etat.categories} onReordonner={reordonnerCategories}>
+                {(c, { poignee, enDeplacement }) => (
+                  <LigneCategorie
+                    categorie={c}
+                    poignee={poignee}
+                    enDeplacement={enDeplacement}
+                    onEnregistrer={enregistrerCategorie}
+                    onSupprimer={() => supprimerLigne('categories', c.id)}
+                    supprimable={etat.categories.length > 1}
+                  />
+                )}
+              </ListeReordonnable>
+            </div>
+            <LigneReglage
+              icone={Plus}
+              titre="Ajouter une catégorie"
+              onClick={() =>
+                enregistrerCategorie({
+                  nom: 'Nouvelle catégorie',
+                  color: PALETTE[etat.categories.length % PALETTE.length],
+                  unit: 'montant',
+                  suit_gallons: false,
+                  position: etat.categories.length,
+                })
+              }
+            />
+          </GroupeReglage>
+        </>
+      ),
+    },
+    {
+      id: 'apparence',
+      libelle: 'Apparence',
+      icone: Palette,
+      rendu: () => (
         <GroupeReglage
           titre="Apparence"
           aide="« Système » suit le réglage de votre téléphone et bascule tout seul le soir."
@@ -204,69 +240,164 @@ export default function Reglages() {
             />
           </div>
         </GroupeReglage>
+      ),
+    },
+    {
+      id: 'rappels',
+      libelle: 'Rappels',
+      icone: BellRing,
+      rendu: () => <CarteRappel reglages={r} majReglages={majReglages} />,
+    },
+    {
+      id: 'compte',
+      libelle: 'Compte',
+      icone: Cloud,
+      rendu: () => <SectionCompte />,
+    },
+    {
+      id: 'securite',
+      libelle: 'Sécurité',
+      icone: ShieldCheck,
+      rendu: () => <SectionSecurite />,
+    },
+    {
+      id: 'donnees',
+      libelle: 'Données',
+      icone: Database,
+      rendu: () => (
+        <>
+          <GroupeReglage
+            titre="Vos données"
+            aide={aideDonnees(supabaseConfigure, nbRecus, poidsRecus, recusEnLigne)}
+          >
+            <LigneReglage
+              icone={Download}
+              titre="Exporter"
+              sousTitre="Sauvegarde JSON ou classeur Excel"
+              onClick={() => ouvrirFeuille('export')}
+              chevron
+            />
+            <LigneReglage
+              icone={Upload}
+              titre="Importer un fichier"
+              onClick={() => fichier.current?.click()}
+              chevron
+            />
+            <input
+              ref={fichier}
+              type="file"
+              accept=".json,.csv,application/json,text/csv"
+              onChange={televerser}
+              className="hidden"
+            />
+            <LigneReglage
+              icone={RotateCcw}
+              titre="Charger des données fictives"
+              sousTitre="Pour découvrir l'application"
+              onClick={async () => {
+                if (
+                  confirm(
+                    'Effacer vos données réelles et les remplacer par 60 jours de chiffres fictifs ?\n\n' +
+                      'À n’utiliser que pour découvrir l’application.',
+                  )
+                ) {
+                  await reinitialiserDemo()
+                  setMessage('Données fictives chargées. Utilisez « Repartir de zéro » pour les enlever.')
+                }
+              }}
+            />
+            <LigneReglage
+              icone={Trash2}
+              titre="Repartir de zéro"
+              danger
+              onClick={async () => {
+                if (confirm('Effacer définitivement toutes vos données ? Cette action est irréversible.')) {
+                  await viderTout()
+                  setMessage('Toutes les données ont été effacées.')
+                }
+              }}
+            />
+          </GroupeReglage>
 
-        {/* ---- Compte et securite -------------------------------------- */}
-        <SectionCompte />
-        <SectionSecurite />
+          {message && (
+            <div className="px-1">
+              <Pastille bloc>{message}</Pastille>
+            </div>
+          )}
+        </>
+      ),
+    },
+  ]
 
-        {/* ---- Donnees ------------------------------------------------- */}
-        <GroupeReglage titre="Vos données" aide={aideDonnees(supabaseConfigure, nbRecus, poidsRecus, recusEnLigne)}>
-          <LigneReglage
-            icone={Download}
-            titre="Exporter"
-            sousTitre="Sauvegarde JSON ou classeur Excel"
-            onClick={() => ouvrirFeuille('export')}
-            chevron
-          />
-          <LigneReglage
-            icone={Upload}
-            titre="Importer un fichier"
-            onClick={() => fichier.current?.click()}
-            chevron
-          />
-          <input
-            ref={fichier}
-            type="file"
-            accept=".json,.csv,application/json,text/csv"
-            onChange={televerser}
-            className="hidden"
-          />
-          <LigneReglage
-            icone={RotateCcw}
-            titre="Charger des données fictives"
-            sousTitre="Pour découvrir l'application"
-            onClick={async () => {
-              if (
-                confirm(
-                  'Effacer vos données réelles et les remplacer par 60 jours de chiffres fictifs ?\n\n' +
-                    'À n’utiliser que pour découvrir l’application.',
-                )
-              ) {
-                await reinitialiserDemo()
-                setMessage('Données fictives chargées. Utilisez « Repartir de zéro » pour les enlever.')
-              }
-            }}
-          />
-          <LigneReglage
-            icone={Trash2}
-            titre="Repartir de zéro"
-            danger
-            onClick={async () => {
-              if (confirm('Effacer définitivement toutes vos données ? Cette action est irréversible.')) {
-                await viderTout()
-                setMessage('Toutes les données ont été effacées.')
-              }
-            }}
-          />
-        </GroupeReglage>
+  const actif = categories.find((c) => c.id === onglet) ?? categories[0]
 
-        {message && (
-          <div className="px-1">
-            <Pastille bloc>{message}</Pastille>
+  return (
+    <>
+      <EnTete titre="Réglages" avecAjout={false} />
+
+      {/* `reglages` cale la colonne au bord gauche du titre et porte le
+          rehaussement de contraste local du texte discret. */}
+      {desktop ? (
+        <div className="reglages flex gap-8">
+          <RailReglages categories={categories} actif={onglet} onChange={setOnglet} />
+          {/* `key` sur l'onglet : le panneau se refond en douceur à chaque
+              changement, ce qui confirme le clic sans retenir la lecture. */}
+          <div
+            key={onglet}
+            className="flex min-w-0 max-w-[640px] flex-1 flex-col gap-6 animate-[apparition_.18s_ease]"
+          >
+            {actif.rendu()}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="reglages flex flex-col gap-6">
+          {categories.map((c) => (
+            <div key={c.id} className="flex flex-col gap-6">
+              {c.rendu()}
+            </div>
+          ))}
+        </div>
+      )}
     </>
+  )
+}
+
+/**
+ * Rail des catégories, sur grand écran. Un maître-détail : on choisit à gauche,
+ * on lit à droite. L'item actif se détache par une surface claire posée sur le
+ * fond, exactement comme une carte — le même vocabulaire que le reste de l'app.
+ */
+function RailReglages({ categories, actif, onChange }) {
+  return (
+    <nav
+      aria-label="Catégories de réglages"
+      className="sticky top-5 flex h-max w-[200px] shrink-0 flex-col gap-1"
+    >
+      {categories.map((c) => {
+        const on = c.id === actif
+        return (
+          <button
+            key={c.id}
+            onClick={() => onChange(c.id)}
+            aria-current={on ? 'page' : undefined}
+            className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-left text-sm transition-colors outline-none hover:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+            style={{
+              background: on ? 'var(--surface)' : 'transparent',
+              color: on ? 'var(--texte)' : 'var(--texte-doux)',
+              border: on ? '1px solid var(--bordure)' : '1px solid transparent',
+              fontWeight: on ? 500 : 400,
+            }}
+          >
+            <c.icone
+              size={17}
+              strokeWidth={1.75}
+              style={{ color: on ? 'var(--accent)' : 'var(--texte-doux)' }}
+            />
+            {c.libelle}
+          </button>
+        )
+      })}
+    </nav>
   )
 }
 
