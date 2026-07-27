@@ -49,6 +49,7 @@ export default function Analytiques() {
           titre="Bénéfice Net"
           chiffre={formatHTG(c.benefice)}
           delta={c.deltaBenefice}
+          deltaColore
           sousLigne={
             c.beneficePrecedent != null
               ? `${formatHTG(c.beneficePrecedent)} à la même date le mois dernier`

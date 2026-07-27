@@ -18,6 +18,7 @@ export default function CarteHero({
   titre,
   chiffre,
   delta,
+  deltaColore = false,
   sousLigne,
   sousChiffres,
   action,
@@ -52,7 +53,7 @@ export default function CarteHero({
 
       <div className="mt-2 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
         <span className="chiffre-hero">{chiffre}</span>
-        <Delta valeur={delta} surSombre={sombre} />
+        <Delta valeur={delta} surSombre={sombre} colore={deltaColore} />
       </div>
 
       {sousLigne && <p className="sous-ligne mt-1">{sousLigne}</p>}

@@ -103,6 +103,19 @@
   --rouge: #dc2626;
   --rouge-clair: #fee2e2;
 
+  /* --- Variation (Delta) : signal de tendance, OPTIONNEL -----------------
+     Le Delta reste gris par defaut — c'est le calme de la maquette. Quand on
+     choisit de le colorer (la tendance du benefice net), la hausse et la
+     baisse empruntent ces jetons. Verifies au contraste, >= 4,5:1 sur leur
+     fond. Les variantes `-hero` sont eclaircies pour rester lisibles sur le
+     bleu profond de la carte principale — un vert/rouge normal y tomberait
+     sous le seuil. Le hero etant fonce dans les deux themes, elles ne varient
+     pas d'un theme a l'autre. */
+  --delta-haut: #15803d;
+  --delta-bas: var(--rouge);
+  --delta-haut-hero: #4ade80;
+  --delta-bas-hero: #ffb3b3;
+
   /* --- Ombres ------------------------------------------------------------
      Quasi imperceptibles : dans la maquette les cartes se detachent par le
      contraste avec le fond, pas par une ombre. */
@@ -161,6 +174,11 @@
 
   --rouge: #f87171;
   --rouge-clair: #450a0a;
+
+  /* Sur carte claire (sombre) : le vert et le rouge du theme sont deja
+     eclaircis, donc lisibles tels quels. Les `-hero` restent ceux du :root. */
+  --delta-haut: var(--vert);
+  --delta-bas: var(--rouge);
 
   --ombre-carte: 0 1px 2px rgb(0 0 0 / 0.4);
   --ombre-flottant: 0 8px 24px rgb(0 0 0 / 0.55);

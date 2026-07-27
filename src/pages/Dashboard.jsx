@@ -102,6 +102,7 @@ export default function Dashboard() {
               coin={<BoutonMasque />}
               chiffre={m(formatHTG(c.benefice))}
               delta={caches ? null : c.deltaBenefice}
+              deltaColore
               sousLigne={
                 c.beneficePrecedent != null
                   ? `${m(formatHTG(c.beneficePrecedent))} à la même date le mois dernier`
