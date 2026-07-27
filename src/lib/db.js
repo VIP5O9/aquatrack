@@ -108,7 +108,7 @@ export const REGLAGES_DEFAUT = {
   // PBKDF2 et le sel qui l'accompagne. Ces champs restent LOCAUX — `reglages`
   // ne fait pas partie des tables synchronisees.
   verrou_actif: false,
-  verrou_delai: '1m',
+  verrou_delai: '5m',
   verrou_sel: null,
   verrou_empreinte: null,
   verrou_biometrie: null,

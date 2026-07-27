@@ -16,6 +16,7 @@ import { demarrerSync } from './lib/sync.js'
 import { demarrerRappel } from './lib/notification.js'
 import { suivreSysteme } from './lib/theme.js'
 import { surChangementSession } from './lib/auth.js'
+import { delaiEnMs } from './lib/verrou.js'
 
 /**
  * Coquille de l'application.
@@ -30,8 +31,11 @@ export default function App() {
   const themeSystemeChange = useStore((s) => s.themeSystemeChange)
   const applicationMasquee = useStore((s) => s.applicationMasquee)
   const evaluerVerrou = useStore((s) => s.evaluerVerrou)
+  const verrouiller = useStore((s) => s.verrouiller)
   const majSession = useStore((s) => s.majSession)
   const verrouille = useStore((s) => s.verrouille)
+  const verrouActif = useStore((s) => s.reglages.verrou_actif)
+  const verrouDelai = useStore((s) => s.reglages.verrou_delai)
   const appareilConfigure = useStore((s) => s.appareilConfigure)
   const pret = useStore((s) => s.pret)
   // Ces deux valeurs re-arment la minuterie de rappel quand elles changent :
@@ -80,6 +84,28 @@ export default function App() {
     document.addEventListener('visibilitychange', surVisibilite)
     return () => document.removeEventListener('visibilitychange', surVisibilite)
   }, [pret, applicationMasquee, evaluerVerrou])
+
+  // Verrouillage par INACTIVITE : tant que l'app est au premier plan, une
+  // minuterie s'arme et se reinitialise a chaque geste. A echeance, on
+  // verrouille — le telephone laisse ouvert sur le comptoir finit protege sans
+  // qu'on ait pense a quitter l'app. La minuterie ne vit que verrou arme et
+  // ecran deverrouille ; verrouiller() coupe la boucle en changeant `verrouille`.
+  useEffect(() => {
+    if (!pret || !verrouActif || verrouille) return
+    const ms = delaiEnMs(verrouDelai)
+    let minuteur
+    const armer = () => {
+      clearTimeout(minuteur)
+      minuteur = setTimeout(() => verrouiller(), ms)
+    }
+    const gestes = ['pointerdown', 'keydown', 'touchstart', 'wheel']
+    gestes.forEach((e) => window.addEventListener(e, armer, { passive: true }))
+    armer()
+    return () => {
+      clearTimeout(minuteur)
+      gestes.forEach((e) => window.removeEventListener(e, armer))
+    }
+  }, [pret, verrouActif, verrouDelai, verrouille, verrouiller])
 
   // Le splash occupe tout l'ecran : ni navigation ni gouttiere.
   const nu = pathname === '/'

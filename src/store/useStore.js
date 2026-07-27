@@ -232,6 +232,18 @@ export const useStore = create((set, get) => ({
     set({ verrouille: false })
   },
 
+  /**
+   * Verrouille sur-le-champ. Appelee par la minuterie d'inactivite (App.jsx)
+   * et par le bouton « Verrouiller maintenant ». Sans effet si le verrou n'est
+   * pas armé, ou s'il l'est déjà.
+   */
+  verrouiller() {
+    const { reglages, verrouille } = get()
+    if (reglages.verrou_actif && reglages.verrou_empreinte && !verrouille) {
+      set({ verrouille: true })
+    }
+  },
+
   /** Appelee au retour au premier plan et au demarrage. */
   evaluerVerrou() {
     const { reglages, verrouille } = get()

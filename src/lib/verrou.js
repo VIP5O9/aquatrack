@@ -141,16 +141,25 @@ export async function demanderBiometrie(idBase64) {
    Delais
    ========================================================================== */
 
+/**
+ * Delai d'inactivite avant verrouillage. Le meme seuil sert dans les deux
+ * situations : l'app posee et inactive au premier plan, et l'app quittee puis
+ * rouverte. Au-dela, le telephone a pu changer de mains.
+ */
 export const DELAIS = [
-  { valeur: 'instant', libelle: 'Immédiat', ms: 0, aide: 'Dès que vous quittez l’app' },
-  { valeur: '1m', libelle: '1 minute', ms: 60_000, aide: 'Le temps de répondre à un appel' },
-  { valeur: '5m', libelle: '5 minutes', ms: 300_000, aide: 'Confortable au comptoir' },
+  { valeur: '1m', libelle: '1 min', ms: 60_000, aide: 'après 1 minute sans activité' },
+  { valeur: '5m', libelle: '5 min', ms: 300_000, aide: 'après 5 minutes sans activité' },
+  { valeur: '15m', libelle: '15 min', ms: 900_000, aide: 'après 15 minutes sans activité' },
 ]
 
-export const delaiEnMs = (v) => DELAIS.find((d) => d.valeur === v)?.ms ?? 0
+// Valeur de repli : 5 min. Un delai inconnu (ancien reglage « immediat ») ne
+// doit jamais donner 0 ms — au premier plan, cela verrouillerait en pleine
+// saisie.
+export const DELAI_DEFAUT_MS = 300_000
+export const delaiEnMs = (v) => DELAIS.find((d) => d.valeur === v)?.ms ?? DELAI_DEFAUT_MS
 
 /**
- * Faut-il verrouiller ?
+ * Faut-il verrouiller au retour au premier plan ?
  *
  * `depuis` est l'instant ou l'application a ete masquee. Un demarrage a froid
  * (`depuis` absent) verrouille toujours : c'est le cas ou le telephone a le
