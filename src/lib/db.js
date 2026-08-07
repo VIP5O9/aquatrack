@@ -230,6 +230,7 @@ export async function enregistrerJournee({
   releve_compteur = null,
   prix_reference,
   note = '',
+  user_id = null,
 }) {
   // On cherche la ligne existante SUPPRIMEE OU NON : si la date a deja ete
   // clôturee puis supprimee, on reutilise son identifiant pour la ressusciter
@@ -246,6 +247,10 @@ export async function enregistrerJournee({
     releve_compteur,
     prix_reference,
     note,
+    // Qui a saisi la ligne, pour « saisi par Marie » quand plusieurs personnes
+    // tiennent le meme kiosque. On garde l'auteur d'origine si la re-cloture se
+    // fait hors connexion (aucun compte courant) plutot que de l'effacer.
+    user_id: user_id ?? existante?.user_id ?? null,
     updated_at: maintenant(),
     deleted: false,
   }
@@ -263,6 +268,7 @@ export async function enregistrerDepense({
   entry_mode = null,
   payment_method = 'cash',
   note = '',
+  user_id = null,
 }) {
   const ligne = {
     id: id ?? crypto.randomUUID(),
@@ -285,6 +291,8 @@ export async function enregistrerDepense({
     entry_mode,
     payment_method,
     note,
+    // Qui a saisi la depense — voir enregistrerJournee.
+    user_id,
     updated_at: maintenant(),
     deleted: false,
   }

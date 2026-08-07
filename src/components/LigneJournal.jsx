@@ -41,7 +41,7 @@ export default function LigneJournal({ ligne, onClick, masque = false }) {
 
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">{ligne.libelle}</span>
-        <span className="sous-ligne flex items-center gap-1.5 truncate">
+        <span className="sous-ligne flex min-w-0 items-center gap-1.5">
           {/* Trombone : dit d'un coup d'oeil quelles dépenses sont justifiées
               par un reçu, sans avoir à ouvrir chaque ligne. */}
           {ligne.nbRecus > 0 && (
@@ -50,7 +50,12 @@ export default function LigneJournal({ ligne, onClick, masque = false }) {
               {ligne.nbRecus > 1 && ligne.nbRecus}
             </span>
           )}
-          <span className="truncate">{ligne.detail}</span>
+          <span className="min-w-0 truncate">{ligne.detail}</span>
+          {/* Qui a saisi : reste visible (shrink-0) pendant que le détail se
+              tronque — c'est l'info de responsabilité, pas un ornement. */}
+          {ligne.auteur && (
+            <span className="shrink-0 whitespace-nowrap">· {ligne.auteur}</span>
+          )}
         </span>
       </span>
 
@@ -78,7 +83,16 @@ export default function LigneJournal({ ligne, onClick, masque = false }) {
  * Regroupe ici la mise en forme pour que le tableau de bord et le journal
  * affichent rigoureusement la meme chose.
  */
-export function versLigne(source, { categories = [], recus = [] } = {}) {
+export function versLigne(source, { categories = [], recus = [], membres = [] } = {}) {
+  // « Saisi par qui » : on ne l'affiche qu'a partir de deux membres — un
+  // kiosque solo n'a personne a distinguer, et « saisi par vous » partout ne
+  // serait que du bruit. Un user_id sans membre correspondant (membre retire)
+  // ne montre rien plutot qu'un nom trompeur.
+  const auteur =
+    membres.length >= 2
+      ? membres.find((m) => m.user_id === source.user_id)?.nom?.trim() || null
+      : null
+
   if (source.date !== undefined) {
     const libelle = `Recette du ${formatDateCourte(source.date)}`
     const detail = `${formatGallons(source.gallons)} · ${formatPrix(source.prix_reference)}/gallon${
@@ -90,6 +104,7 @@ export function versLigne(source, { categories = [], recus = [] } = {}) {
       tri: `${source.date}T23:59:59`,
       libelle,
       detail,
+      auteur,
       montant: source.montant,
       // Corpus de recherche : libelle, note, et le montant en chiffres bruts
       // pour qu'une recherche « 1500 » retombe sur la recette correspondante.
@@ -120,6 +135,7 @@ export function versLigne(source, { categories = [], recus = [] } = {}) {
     tri: source.occurred_at,
     libelle,
     detail,
+    auteur,
     montant: source.total,
     couleur: cat?.color ?? '#222026',
     suitGallons: !!cat?.suit_gallons,

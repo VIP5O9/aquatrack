@@ -117,6 +117,12 @@ export const useStore = create((set, get) => ({
      l'application fonctionne integralement sans compte. */
   session: null,
 
+  /* --- Membres du kiosque : { user_id, role, nom } -----------------------
+     Sert a traduire le `user_id` d'une ligne en « saisi par Marie ». Reste
+     vide sans compte ni reseau ; l'attribution ne s'affiche qu'a partir de
+     deux membres (un kiosque solo n'a personne a distinguer). */
+  membres: [],
+
   /**
    * L'appareil a-t-il deja ete configure une fois ?
    *
@@ -148,6 +154,21 @@ export const useStore = create((set, get) => ({
     // Une connexion doit declencher l'envoi de tout ce qui attend, sans que
     // l'utilisateur ait a patienter jusqu'au prochain cycle de 60 s.
     get().apresEcriture()
+    // La liste des membres depend du compte : on la rafraichit a chaque
+    // changement de session (connexion, rattachement a un kiosque).
+    get().rafraichirMembres()
+  },
+
+  /**
+   * Recharge la liste des membres du kiosque (pour « saisi par qui »).
+   *
+   * On ne remplace la liste connue que par une liste NON VIDE : une coupure
+   * reseau renvoie `[]`, et effacer la liste ferait clignoter l'attribution.
+   * Un vrai kiosque a toujours au moins son proprietaire.
+   */
+  async rafraichirMembres() {
+    const membres = await membresKiosque()
+    if (membres.length) set({ membres })
   },
 
   /**
@@ -338,6 +359,9 @@ export const useStore = create((set, get) => ({
       set({ pret: true })
       get().evaluerVerrou()
       get().rafraichirSync()
+      // Qui compose le kiosque, pour attribuer les saisies. En tache de fond :
+      // l'affichage ne doit pas attendre le reseau.
+      get().rafraichirMembres()
 
       // « Administrateur » etait un nom par defaut invente, que personne
       // n'avait choisi. On le remplace des qu'un vrai nom est connu — sans
@@ -365,13 +389,16 @@ export const useStore = create((set, get) => ({
   /* --- Ecritures -------------------------------------------------------- */
 
   async cloturerJour(saisie) {
-    await db.enregistrerJournee(saisie)
+    // On estampille l'auteur ici : le `user_id` de la session courante suit la
+    // ligne dès sa création, y compris hors ligne, sans attendre un aller-retour
+    // par le serveur.
+    await db.enregistrerJournee({ ...saisie, user_id: get().session?.user?.id ?? null })
     await get().recharger()
     get().apresEcriture()
   },
 
   async ajouterDepense(saisie) {
-    await db.enregistrerDepense(saisie)
+    await db.enregistrerDepense({ ...saisie, user_id: get().session?.user?.id ?? null })
     await get().recharger()
     get().apresEcriture()
   },
@@ -513,6 +540,9 @@ export const useEtat = () =>
       categories: s.categories,
       recus: s.recus,
       reglages: s.reglages,
+      // Porte pour que versLigne puisse traduire user_id -> « saisi par ». Les
+      // fonctions de lib/metrics.js l'ignorent simplement.
+      membres: s.membres,
     })),
   )
 

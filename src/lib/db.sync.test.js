@@ -9,6 +9,7 @@ import {
   supprimer,
   fusionnerDepuisServeur,
   idsOutboxEnAttente,
+  lireOutbox,
   chargerTout,
 } from './db.js'
 
@@ -140,5 +141,62 @@ describe('amorcerCategories', () => {
     const creees = await amorcerCategories()
     expect(creees.length).toBeGreaterThanOrEqual(3)
     expect((await chargerTout()).categories.length).toBeGreaterThanOrEqual(3)
+  })
+})
+
+describe('attribution — « saisi par qui » (user_id)', () => {
+  it('conserve le user_id sur la journée ET dans le payload d’envoi', async () => {
+    const j = await enregistrerJournee({
+      date: '2026-09-10',
+      montant: 1500,
+      gallons: 60,
+      prix_reference: 25,
+      user_id: 'user-marie',
+    })
+
+    // Stocké sur la ligne locale : l'attribution marche tout de suite, hors ligne.
+    const local = (await chargerTout()).journees.find((x) => x.id === j.id)
+    expect(local.user_id).toBe('user-marie')
+
+    // Et présent dans le payload qui partira au serveur (RLS l'accepte : c'est
+    // le compte courant).
+    const entree = (await lireOutbox(500)).find(
+      (e) => e.table === 'journees' && e.row_id === j.id,
+    )
+    expect(entree?.payload.user_id).toBe('user-marie')
+  })
+
+  it('conserve le user_id sur une dépense', async () => {
+    const d = await enregistrerDepense({
+      occurred_at: '2026-09-10T12:00:00.000Z',
+      category_id: null,
+      total: 800,
+      user_id: 'user-paul',
+    })
+    const dep = (await chargerTout()).depenses.find((x) => x.id === d.id)
+    expect(dep.user_id).toBe('user-paul')
+  })
+
+  it('garde l’auteur d’origine si la re-clôture se fait sans compte', async () => {
+    await enregistrerJournee({
+      date: '2026-09-11',
+      montant: 1000,
+      gallons: 40,
+      prix_reference: 25,
+      user_id: 'user-marie',
+    })
+    // Re-clôture hors connexion (aucun compte courant) : la valeur change, mais
+    // l'auteur d'origine ne doit pas être effacé.
+    await enregistrerJournee({
+      date: '2026-09-11',
+      montant: 1200,
+      gallons: 48,
+      prix_reference: 25,
+      user_id: null,
+    })
+
+    const local = (await chargerTout()).journees.find((x) => x.date === '2026-09-11')
+    expect(local.montant).toBe(1200)
+    expect(local.user_id).toBe('user-marie')
   })
 })
