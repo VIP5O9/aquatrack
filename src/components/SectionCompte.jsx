@@ -102,12 +102,12 @@ export default function SectionCompte() {
       >
         {/* Statut du compte */}
         <div
-          className="flex items-center gap-3 px-3.5 py-3"
-          style={{ borderBottom: '1px solid var(--bordure)' }}
+          className="flex items-center gap-3 px-4 py-3.5"
+          style={{ borderBottom: '1px solid var(--border-subtle)' }}
         >
           <ChipIcone icone={Cloud} couleur="var(--vert)" />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm">{session.user?.email}</span>
+            <span className="block truncate text-sm font-medium">{session.user?.email}</span>
             <span className="sous-ligne block">
               {sync.enAttente > 0
                 ? `${sync.enAttente} opération${sync.enAttente > 1 ? 's' : ''} en attente d’envoi`
@@ -117,7 +117,7 @@ export default function SectionCompte() {
         </div>
 
         {/* Kiosque partagé */}
-        <div className="px-3.5 py-3" style={{ borderBottom: '1px solid var(--bordure)' }}>
+        <div className="px-4 py-3.5" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <BlocKiosque
             kiosque={kiosque}
             membres={membres}
@@ -161,16 +161,16 @@ export default function SectionCompte() {
             setOccupe(false)
           }}
           disabled={occupe}
-          className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] disabled:opacity-50"
+          className="tactile-press-subtil flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)] disabled:opacity-50"
         >
           <ChipIcone icone={LogOut} danger />
-          <span className="text-sm" style={{ color: 'var(--rouge)' }}>
+          <span className="text-sm font-medium" style={{ color: 'var(--rouge)' }}>
             Se déconnecter
           </span>
         </button>
 
         {message && (
-          <div className="px-3.5 pt-1 pb-3.5">
+          <div className="px-4 pt-1 pb-4">
             <Pastille bloc>{message}</Pastille>
           </div>
         )}
@@ -181,7 +181,7 @@ export default function SectionCompte() {
   /* --- Configure, deconnecte --------------------------------------------- */
   return (
     <GroupeReglage titre="Sauvegarde en ligne">
-      <div className="px-3.5 py-4">
+      <div className="px-4 py-4">
       <p className="sous-ligne mb-4">
         Connectez-vous pour sauvegarder vos données hors de ce téléphone.
       </p>
@@ -190,7 +190,7 @@ export default function SectionCompte() {
         <ChampTexte label="Email" valeur={email} onChange={setEmail} placeholder="vous@exemple.com" />
 
         <label className="block">
-          <span className="mb-1.5 block text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+          <span className="mb-1.5 block text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
             Mot de passe
           </span>
           <input
@@ -200,7 +200,7 @@ export default function SectionCompte() {
             onChange={(e) => setMotDePasse(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && soumettre()}
             placeholder="6 caractères minimum"
-            className="w-full rounded-[16px] px-4 py-3 text-sm outline-none"
+            className="w-full rounded-[16px] px-4 py-3 text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-[var(--accent)]"
             style={{ background: 'var(--surface-doux)' }}
           />
         </label>
@@ -208,7 +208,7 @@ export default function SectionCompte() {
         <button
           onClick={soumettre}
           disabled={occupe}
-          className="flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
+          className="tactile-press-accent flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-medium shadow-sm transition-all outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
           style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
         >
           {occupe && <Loader2 size={16} className="animate-spin" />}
@@ -320,11 +320,11 @@ function ChangementMotDePasse() {
     return (
       <button
         onClick={() => setOuvert(true)}
-        className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
-        style={{ borderBottom: '1px solid var(--bordure)' }}
+        className="tactile-press-subtil flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+        style={{ borderBottom: '1px solid var(--border-subtle)' }}
       >
         <ChipIcone icone={KeyRound} />
-        <span className="flex-1 text-sm">Changer le mot de passe</span>
+        <span className="flex-1 text-sm font-medium">Changer le mot de passe</span>
         <ChevronRight size={17} strokeWidth={2} style={{ color: 'var(--texte-tres-doux)' }} />
       </button>
     )
@@ -338,17 +338,17 @@ function ChangementMotDePasse() {
       onChange={(e) => set(e.target.value)}
       onKeyDown={(e) => e.key === 'Enter' && soumettre()}
       placeholder={ph}
-      className="w-full rounded-[12px] px-3.5 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+      className="w-full rounded-[14px] px-3.5 py-2.5 text-sm font-medium outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
       style={{ background: 'var(--surface-doux)' }}
     />
   )
 
   return (
     <div
-      className="flex flex-col gap-2.5 px-3.5 py-3.5"
-      style={{ borderBottom: '1px solid var(--bordure)' }}
+      className="flex flex-col gap-3 px-4 py-4"
+      style={{ borderBottom: '1px solid var(--border-subtle)' }}
     >
-      <p className="text-[13px] font-medium">Changer le mot de passe</p>
+      <p className="text-[13px] font-medium tracking-tight">Changer le mot de passe</p>
 
       {fait ? (
         <Pastille bloc>
@@ -369,7 +369,7 @@ function ChangementMotDePasse() {
           <button
             onClick={soumettre}
             disabled={occupe || !actuel || !nouveau || !confirme}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
+            className="tactile-press-accent flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium shadow-sm transition-all outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)] disabled:opacity-50"
             style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
           >
             {occupe && <Loader2 size={15} className="animate-spin" />}
@@ -378,7 +378,7 @@ function ChangementMotDePasse() {
         )}
         <button
           onClick={fermer}
-          className="flex-1 rounded-full py-2.5 text-[13px] transition-colors outline-none hover:brightness-95 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+          className="tactile-press flex-1 rounded-full py-2.5 text-[13px] font-medium transition-colors outline-none hover:brightness-95 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
           style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
         >
           {fait ? 'Fermer' : 'Annuler'}
@@ -427,7 +427,7 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
           <div className="mt-3 flex flex-col gap-2">
             <button
               onClick={() => setMode('creer')}
-              className="flex items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium"
+              className="tactile-press-accent flex items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium shadow-sm"
               style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
             >
               <Store size={15} strokeWidth={2} />
@@ -435,7 +435,7 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
             </button>
             <button
               onClick={() => setMode('rejoindre')}
-              className="flex items-center justify-center gap-2 rounded-full py-2.5 text-[13px]"
+              className="tactile-press flex items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium"
               style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
             >
               <UserPlus size={15} strokeWidth={1.75} />
@@ -501,7 +501,7 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
       <div className="flex items-center gap-2.5">
         <Store size={16} strokeWidth={1.75} style={{ color: 'var(--texte-doux)' }} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{kiosque.nom}</span>
-        <span className="sous-ligne shrink-0">
+        <span className="sous-ligne shrink-0 font-medium">
           {membres.length} membre{membres.length > 1 ? 's' : ''}
         </span>
       </div>
@@ -518,10 +518,10 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
               setCopie(true)
               setTimeout(() => setCopie(false), 2000)
             }}
-            className="flex w-full items-center justify-between gap-2 rounded-[14px] px-4 py-3"
-            style={{ background: 'var(--surface-doux)' }}
+            className="tactile-press flex w-full items-center justify-between gap-2 rounded-[14px] border border-[var(--border-subtle)] px-4 py-3 shadow-sm transition-all"
+            style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
           >
-            <span className="chiffres text-lg tracking-[0.25em]">
+            <span className="chiffres text-lg font-medium tracking-[0.25em]">
               {kiosque.code_invitation}
             </span>
             {copie ? (
@@ -537,15 +537,15 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
         {membres.map((m) => (
           <li
             key={m.user_id}
-            className="flex items-center gap-2.5 py-2"
-            style={{ borderTop: '1px solid var(--bordure)' }}
+            className="flex items-center gap-2.5 py-2.5"
+            style={{ borderTop: '1px solid var(--border-subtle)' }}
           >
-            <span className="min-w-0 flex-1 truncate text-sm">
+            <span className="min-w-0 flex-1 truncate text-sm font-medium">
               {m.nom || (m.user_id === idCourant ? 'Vous' : 'Membre')}
               {m.user_id === idCourant && m.nom && ' (vous)'}
             </span>
             <span
-              className="shrink-0 rounded-full px-2 py-0.5 text-[10px]"
+              className="shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-medium"
               style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
             >
               {m.role === 'proprietaire' ? 'Propriétaire' : 'Employé'}
@@ -554,8 +554,7 @@ function BlocKiosque({ kiosque, membres, idCourant, onChange }) {
               <button
                 onClick={() => agir(() => retirerMembre(m.user_id))}
                 aria-label="Retirer ce membre"
-                className="shrink-0 p-1"
-                style={{ color: 'var(--texte-tres-doux)' }}
+                className="tactile-press shrink-0 rounded-lg p-1 text-[var(--texte-tres-doux)] transition-colors hover:text-[var(--rouge)]"
               >
                 <X size={15} strokeWidth={2} />
               </button>
@@ -579,7 +578,7 @@ function Actions({ occupe, libelle, onValider, onAnnuler }) {
       <button
         onClick={onValider}
         disabled={occupe}
-        className="flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium disabled:opacity-50"
+        className="tactile-press-accent flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-[13px] font-medium shadow-sm disabled:opacity-50"
         style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
       >
         {occupe && <Loader2 size={14} className="animate-spin" />}
@@ -587,7 +586,7 @@ function Actions({ occupe, libelle, onValider, onAnnuler }) {
       </button>
       <button
         onClick={onAnnuler}
-        className="px-3 text-[13px]"
+        className="tactile-press rounded-full px-4 py-2.5 text-[13px] font-medium"
         style={{ color: 'var(--texte-doux)' }}
       >
         Annuler

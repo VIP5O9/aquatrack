@@ -371,7 +371,7 @@ function RailReglages({ categories, actif, onChange }) {
   return (
     <nav
       aria-label="Catégories de réglages"
-      className="sticky top-5 flex h-max w-[200px] shrink-0 flex-col gap-1"
+      className="sticky top-5 flex h-max w-[210px] shrink-0 flex-col gap-1.5"
     >
       {categories.map((c) => {
         const on = c.id === actif
@@ -380,20 +380,21 @@ function RailReglages({ categories, actif, onChange }) {
             key={c.id}
             onClick={() => onChange(c.id)}
             aria-current={on ? 'page' : undefined}
-            className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-left text-sm transition-colors outline-none hover:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+            className="tactile-press-subtil flex items-center gap-3 rounded-[14px] px-3.5 py-3 text-left text-sm transition-all duration-150 outline-none hover:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
             style={{
               background: on ? 'var(--surface)' : 'transparent',
               color: on ? 'var(--texte)' : 'var(--texte-doux)',
-              border: on ? '1px solid var(--bordure)' : '1px solid transparent',
+              border: on ? '1px solid var(--border-subtle)' : '1px solid transparent',
+              boxShadow: on ? 'var(--rim-light-subtle), var(--ombre-carte)' : 'none',
               fontWeight: on ? 500 : 400,
             }}
           >
             <c.icone
-              size={17}
-              strokeWidth={1.75}
+              size={18}
+              strokeWidth={on ? 2 : 1.75}
               style={{ color: on ? 'var(--accent)' : 'var(--texte-doux)' }}
             />
-            {c.libelle}
+            <span className="truncate">{c.libelle}</span>
           </button>
         )
       })}
@@ -431,14 +432,14 @@ function LigneCategorie({
 
   return (
     <div
-      className="flex items-center gap-2.5 px-1 py-2.5"
-      style={{ borderBottom: enDeplacement ? 'none' : '1px solid var(--bordure)' }}
+      className="flex items-center gap-3 px-2 py-2.5 transition-colors"
+      style={{ borderBottom: enDeplacement ? 'none' : '1px solid var(--border-subtle)' }}
     >
       {/* Cible tactile elargie : une icone de 15px se rate une fois sur deux
           au doigt, et rater la poignee fait defiler la page a la place. */}
       <span
         {...poignee}
-        className="-m-2 grid size-9 shrink-0 place-items-center rounded-lg outline-none transition-colors hover:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+        className="-m-1 grid size-9 shrink-0 place-items-center rounded-lg outline-none transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         style={{ ...poignee?.style, color: 'var(--texte-tres-doux)' }}
       >
         <GripVertical size={16} />
@@ -450,20 +451,20 @@ function LigneCategorie({
           const i = PALETTE.indexOf(categorie.color)
           onEnregistrer({ ...categorie, color: PALETTE[(i + 1) % PALETTE.length] })
         }}
-        className="size-4 shrink-0 rounded-full outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-        style={{ background: categorie.color, outline: '1px solid rgb(0 0 0 / .08)' }}
+        className="tactile-press size-5 shrink-0 rounded-full shadow-sm outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+        style={{ background: categorie.color, border: '1.5px solid rgba(255, 255, 255, 0.4)' }}
       />
 
       <input
         value={nom}
         onChange={(e) => setNom(e.target.value)}
         onBlur={() => nom !== categorie.nom && onEnregistrer({ ...categorie, nom })}
-        className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+        className="min-w-0 flex-1 rounded-md bg-transparent px-1 py-0.5 text-sm font-medium outline-none transition-colors focus:bg-[var(--surface-doux)]"
       />
 
       {categorie.suit_gallons && (
         <span
-          className="shrink-0 rounded-full px-2 py-0.5 text-[10px]"
+          className="shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-medium"
           style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
         >
           suit les gallons
@@ -474,7 +475,7 @@ function LigneCategorie({
         <button
           onClick={onSupprimer}
           aria-label={`Supprimer ${categorie.nom}`}
-          className="shrink-0 rounded-lg p-1 text-[var(--texte-tres-doux)] transition-colors outline-none hover:text-[var(--rouge)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="tactile-press shrink-0 rounded-lg p-1.5 text-[var(--texte-tres-doux)] transition-colors outline-none hover:bg-[var(--surface-doux)] hover:text-[var(--rouge)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Trash2 size={15} />
         </button>

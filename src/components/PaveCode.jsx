@@ -70,28 +70,40 @@ export default function PaveCode({
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div className={`flex gap-3.5 ${erreur ? 'animate-[secousse_.4s]' : ''}`}>
-        {Array.from({ length: LONGUEUR }, (_, i) => (
-          <span
-            key={i}
-            className="size-3.5 rounded-full transition-colors"
-            style={{
-              background:
-                i < saisie.length ? (erreur ? 'var(--rouge)' : 'var(--action)') : 'var(--gris-data)',
-            }}
-          />
-        ))}
+      <div className={`flex gap-4 ${erreur ? 'animate-[secousse_.4s]' : ''}`}>
+        {Array.from({ length: LONGUEUR }, (_, i) => {
+          const rempli = i < saisie.length
+          return (
+            <span
+              key={i}
+              className="size-3.5 rounded-full transition-all duration-200"
+              style={{
+                background: rempli
+                  ? erreur
+                    ? 'var(--rouge)'
+                    : 'var(--action)'
+                  : 'var(--gris-data)',
+                boxShadow: rempli
+                  ? erreur
+                    ? '0 0 10px rgba(220, 38, 38, 0.5)'
+                    : '0 0 8px rgba(38, 114, 221, 0.35)'
+                  : 'none',
+                transform: rempli ? 'scale(1.1)' : 'scale(1)',
+              }}
+            />
+          )
+        })}
       </div>
 
       <p
-        className="mt-3 h-4 text-xs"
+        className="mt-3 h-4 text-xs font-medium"
         style={{ color: 'var(--rouge)', visibility: erreur ? 'visible' : 'hidden' }}
       >
         {erreurTexte}
       </p>
 
       <div className="mt-4 w-full max-w-[300px]">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3.5">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
             <Touche key={n} hauteur={hauteur} onClick={() => taper(String(n))}>
               {n}
@@ -108,7 +120,7 @@ export default function PaveCode({
               <Fingerprint
                 size={24}
                 strokeWidth={1.75}
-                className={biometrieEnCours ? 'animate-pulse' : ''}
+                className={biometrieEnCours ? 'animate-pulse text-[var(--accent)]' : ''}
               />
             </Touche>
           ) : (
@@ -132,10 +144,13 @@ function Touche({ children, onClick, discret = false, hauteur = 'h-16', ...props
   return (
     <button
       onClick={onClick}
-      className={`grid ${hauteur} place-items-center rounded-[18px] text-xl outline-none transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-[var(--accent)]`}
+      className={`tactile-press grid ${hauteur} place-items-center rounded-[20px] text-2xl font-medium outline-none transition-all focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${
+        discret
+          ? 'bg-transparent text-[var(--texte-doux)] active:opacity-60'
+          : 'border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--texte)] shadow-sm hover:brightness-105 active:scale-90'
+      }`}
       style={{
-        background: discret ? 'transparent' : 'var(--surface)',
-        color: discret ? 'var(--texte-doux)' : 'var(--texte)',
+        boxShadow: discret ? 'none' : 'var(--rim-light-subtle), var(--ombre-carte)',
         fontVariantNumeric: 'tabular-nums',
       }}
       {...props}

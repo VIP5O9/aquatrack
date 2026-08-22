@@ -1,32 +1,14 @@
 /* ===========================================================================
-   Aqua Track — jetons de design
+   Aqua Track — Jetons de Design & Système de Surfaces
    ---------------------------------------------------------------------------
-   Source de verite unique du style. Les valeurs du theme clair proviennent des
-   references fournies dans Ressources/ :
-
-     - brading.png    : typographie (Readex Pro) et les 4 couleurs de marque
-     - all_screen.png : composants, densite, hierarchie
-
-   Le bleu, le noir et le gris ont ete verifies au pixel sur all_screen.png.
-   Le cyan (#22D3F5) a ete echantillonne sur les segments du donut.
-
-   ---------------------------------------------------------------------------
-   THEME SOMBRE
-
-   Les references ne couvrent que le clair. Le theme sombre n'est donc PAS une
-   inversion automatique — inverser un noir de marque donnerait un blanc
-   eblouissant. Il est compose : la hierarchie passe par l'elevation (le fond
-   est le plus sombre, les cartes plus claires) plutot que par le contraste
-   noir/blanc, et le bleu est eclairci pour rester lisible sur fond sombre.
-
-   ---------------------------------------------------------------------------
-   Les composants n'utilisent QUE les jetons semantiques (--surface, --action,
-   --accent...), jamais les couleurs de marque directement. C'est ce qui permet
-   aux deux themes de coexister sans dupliquer une seule ligne de composant.
+   Source de vérité unique du style pour Aqua Track.
+   Inspiré des Human Interface Guidelines d'Apple (surfaces translucides,
+   hiérarchie optique, éclairage de bordure rim-light) et des standards
+   d'ingénierie du design d'Emil Kowalski (ressorts physiques, retours tactiles).
    =========================================================================== */
 
 @theme {
-  /* --- Couleurs de marque, invariantes (brading.png) --------------------- */
+  /* --- Couleurs de marque, invariantes ------------------------------------- */
   --color-marque-bleu: #2672dd;
   --color-marque-noir: #222026;
   --color-marque-gris: #f3f3f3;
@@ -38,92 +20,101 @@
   --radius-champ: 16px;
   --radius-barre: 14px;
   --radius-vignette: 12px;
+  --radius-pilule: 9999px;
 }
 
 /* ===========================================================================
-   Theme clair — la reference
+   Thème clair — Apple Fluid Glass & Profondeur Optique
    =========================================================================== */
 
 :root {
   color-scheme: light;
 
-  /* --- Surfaces ---------------------------------------------------------- */
-  --fond: #f3f3f3;          /* fond de page */
-  --surface: #ffffff;       /* cartes */
-  --surface-doux: #f3f3f3;  /* champs, pastilles de categorie, vignettes */
-  --bordure: #e6e6e6;
+  /* --- Surfaces multi-niveaux -------------------------------------------- */
+  --fond: #f4f6fa;                      /* Fond de page principal */
+  --surface: #ffffff;                   /* Cartes standard */
+  --surface-elevated: #ffffff;          /* Cartes élevées, popups, fiches */
+  --surface-elevee: var(--surface-elevated);
+  --surface-doux: #edf1f7;              /* Champs, pastilles de catégorie, vignettes */
 
-  /* --- Texte ------------------------------------------------------------- */
-  --texte: #222026;
-  --texte-doux: rgb(34 32 38 / 0.5);
-  --texte-tres-doux: rgb(34 32 38 / 0.35);
+  /* --- Matériaux Verre Translucide (Apple Glass) ------------------------- */
+  --glass-material: rgba(255, 255, 255, 0.82);
+  --glass-material-subtil: rgba(255, 255, 255, 0.62);
+  --glass-material-elevated: rgba(255, 255, 255, 0.92);
+  --matiere-verre: var(--glass-material);
+  --matiere-verre-subtile: var(--glass-material-subtil);
+  --matiere-verre-elevee: var(--glass-material-elevated);
 
-  /* --- Carte hero --------------------------------------------------------
-     BLEU PROFOND en clair, sombre en mode sombre.
+  /* --- Bordures Optiques & Sous-pixels ----------------------------------- */
+  --bordure: rgba(34, 32, 38, 0.08);    /* Bordure 1px standard */
+  --border-subtle: rgba(34, 32, 38, 0.05); /* Bordure ultra-fine 1px */
+  --bordure-subtile: var(--border-subtle);
 
-     Le bleu dit l'eau, et c'est le sujet. Mais pas n'importe lequel : ce
-     n'est PAS `--accent`. Un accent etale sur la plus grande surface de
-     l'ecran cesse de signaler l'action — le bouton « Ajouter » se fondrait
-     dans le decor. Celui-ci est plus profond, et l'accent garde son role.
+  /* --- Éclairage Rim Light (Apple Inset Highlights) ---------------------- */
+  --rim-light: inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --rim-light-subtle: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+  --rim-light-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.98), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --lumiere-bord: var(--rim-light);
+  --lumiere-bord-subtile: var(--rim-light-subtle);
+  --lumiere-bord-elevee: var(--rim-light-elevated);
 
-     #164E9E est retenu au contraste, pas a l'oeil : blanc plein 8,0:1, et
-     surtout 4,98:1 pour la sous-ligne a 72 % — la nuance a 60 % qui servait
-     sur le noir tombait a 3,97:1 et devenait penible a lire. */
-  --hero: #164E9E;
+  /* --- Texte & Typographie ----------------------------------------------- */
+  --texte: #19181d;
+  --texte-doux: rgb(25 24 29 / 0.56);
+  --texte-tres-doux: rgb(25 24 29 / 0.38);
+
+  /* --- Dégradé Aqua Hero & Palette Océanique ------------------------------ */
+  --hero: #124ea4;
+  --hero-gradient: linear-gradient(140deg, #0d3b7e 0%, #175ec2 52%, #0d9488 100%);
+  --hero-gradient-eclat: linear-gradient(135deg, #175ec2 0%, #06b6d4 100%);
+  --degrade-hero: var(--hero-gradient);
   --sur-hero: #ffffff;
-  --sur-hero-doux: rgb(255 255 255 / 0.72);
-  --sur-hero-faible: rgb(255 255 255 / 0.2); /* gridlines pointillees */
+  --sur-hero-doux: rgb(255 255 255 / 0.82);
+  --sur-hero-faible: rgb(255 255 255 / 0.22);
 
-  /* --- Action forte ------------------------------------------------------
-     Bouton principal, segment actif, pastille d'alerte. Noir en clair,
-     clair en sombre : dans les deux cas, le maximum de contraste avec le
-     fond de page. */
-  --action: #222026;
+  /* --- Action forte & Boutons -------------------------------------------- */
+  --action: #19181d;
   --sur-action: #ffffff;
 
-  /* --- Accent ------------------------------------------------------------ */
+  /* --- Accent Brand & Lueur Luminescente --------------------------------- */
   --accent: #2672dd;
-  --accent-presse: #1f5fbc;
+  --accent-presse: #1a5bb8;
   --sur-accent: #ffffff;
+  --accent-glow: 0 4px 20px rgba(38, 114, 221, 0.28);
+  --lueur-accent: var(--accent-glow);
+  --lueur-hero: 0 12px 36px -8px rgba(18, 78, 164, 0.32);
 
-  /* --- Couleurs de donnees ----------------------------------------------- */
-  --cyan: #22d3f5;
-  --gris-data: #e4e4e6;
+  /* --- Couleurs de données & Visualiseurs --------------------------------- */
+  --cyan: #06b6d4;
+  --gris-data: #e2e6ed;
 
-  /* --- Seule couleur hors planche ----------------------------------------
-     Le badge « Revenu », explicitement demande au brief. Isole ici, utilise
-     au seul endroit LigneJournal. */
+  /* --- Statuts & Badges -------------------------------------------------- */
   --vert: #16a34a;
   --vert-clair: #dcfce7;
-
-  /* --- Action destructive -------------------------------------------------
-     Reservee a ce qui efface. Ne sert jamais a signaler une perte comptable :
-     un benefice negatif reste en encre normale, sans quoi le rouge perdrait
-     son sens d'avertissement. */
   --rouge: #dc2626;
   --rouge-clair: #fee2e2;
 
-  /* --- Variation (Delta) : signal de tendance, OPTIONNEL -----------------
-     Le Delta reste gris par defaut — c'est le calme de la maquette. Quand on
-     choisit de le colorer (la tendance du benefice net), la hausse et la
-     baisse empruntent ces jetons. Verifies au contraste, >= 4,5:1 sur leur
-     fond. Les variantes `-hero` sont eclaircies pour rester lisibles sur le
-     bleu profond de la carte principale — un vert/rouge normal y tomberait
-     sous le seuil. Le hero etant fonce dans les deux themes, elles ne varient
-     pas d'un theme a l'autre. */
+  /* --- Variations Tendance (Delta) --------------------------------------- */
   --delta-haut: #15803d;
   --delta-bas: var(--rouge);
   --delta-haut-hero: #4ade80;
   --delta-bas-hero: #ffb3b3;
 
-  /* --- Ombres ------------------------------------------------------------
-     Quasi imperceptibles : dans la maquette les cartes se detachent par le
-     contraste avec le fond, pas par une ombre. */
-  --ombre-carte: 0 1px 2px rgb(34 32 38 / 0.04);
-  --ombre-flottant: 0 8px 24px rgb(34 32 38 / 0.12);
-  --voile: rgb(34 32 38 / 0.45);
+  /* --- Ombres Douces de Profondeur & Voiles ------------------------------- */
+  --ombre-carte: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px -4px rgba(0, 0, 0, 0.03);
+  --ombre-elevated: 0 4px 14px rgba(0, 0, 0, 0.06), 0 16px 32px -8px rgba(0, 0, 0, 0.08);
+  --ombre-flottant: 0 8px 24px -4px rgba(38, 114, 221, 0.22), 0 12px 32px rgba(0, 0, 0, 0.12);
+  --ombre-verre: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+  --voile: rgb(15 23 42 / 0.45);
 
-  /* --- Gabarit ----------------------------------------------------------- */
+  /* --- Système de Transition Emil Kowalski (Spring Physics) --------------- */
+  --transition-ui: cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-tiroir: cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-tactile: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring-out: var(--transition-ui);
+  --ease-sheet: var(--transition-tiroir);
+
+  /* --- Gabarit & Mise en page -------------------------------------------- */
   --marge-ecran: 16px;
   --gap-cartes: 12px;
   --padding-carte: 20px;
@@ -132,55 +123,84 @@
 }
 
 /* ===========================================================================
-   Theme sombre
+   Thème sombre — Apple Dark Glass & Profondeur Luminescente
    =========================================================================== */
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* Hierarchie par elevation : fond < carte < hero. */
-  --fond: #0f0f12;
-  --surface: #1a191f;
-  --surface-doux: #26252c;
-  --bordure: #2e2d35;
+  /* --- Surfaces multi-niveaux -------------------------------------------- */
+  --fond: #0b0c0f;                      /* Fond de page sombre profond */
+  --surface: #15161b;                   /* Cartes sombres */
+  --surface-elevated: #1f2027;          /* Cartes élevées, tiroirs */
+  --surface-elevee: var(--surface-elevated);
+  --surface-doux: #22232b;              /* Champs, pastilles de catégorie */
 
-  --texte: #ededef;
-  --texte-doux: rgb(237 237 239 / 0.55);
-  --texte-tres-doux: rgb(237 237 239 / 0.38);
+  /* --- Matériaux Verre Translucide (Apple Dark Glass) -------------------- */
+  --glass-material: rgba(21, 22, 27, 0.80);
+  --glass-material-subtil: rgba(21, 22, 27, 0.60);
+  --glass-material-elevated: rgba(31, 32, 39, 0.90);
+  --matiere-verre: var(--glass-material);
+  --matiere-verre-subtile: var(--glass-material-subtil);
+  --matiere-verre-elevee: var(--glass-material-elevated);
 
-  /* Plus CLAIRE que les cartes, pour rester la surface dominante.
-     Le texte dessus demeure blanc, donc tous les graphiques traces en
-     --sur-hero fonctionnent sans changement. */
-  --hero: #2f2d37;
+  /* --- Bordures Optiques & Sous-pixels ----------------------------------- */
+  --bordure: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --bordure-subtile: var(--border-subtle);
+
+  /* --- Éclairage Rim Light (Apple Dark Inset Highlights) ----------------- */
+  --rim-light: inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+  --rim-light-subtle: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  --rim-light-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.20), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --lumiere-bord: var(--rim-light);
+  --lumiere-bord-subtile: var(--rim-light-subtle);
+  --lumiere-bord-elevee: var(--rim-light-elevated);
+
+  /* --- Texte & Typographie ----------------------------------------------- */
+  --texte: #f1f2f6;
+  --texte-doux: rgb(241 242 246 / 0.62);
+  --texte-tres-doux: rgb(241 242 246 / 0.42);
+
+  /* --- Dégradé Aqua Hero & Palette Océanique Sombre ----------------------- */
+  --hero: #1c2738;
+  --hero-gradient: linear-gradient(140deg, #122137 0%, #1a3861 52%, #0e454c 100%);
+  --hero-gradient-eclat: linear-gradient(135deg, #1e4577 0%, #155e75 100%);
+  --degrade-hero: var(--hero-gradient);
   --sur-hero: #ffffff;
-  --sur-hero-doux: rgb(255 255 255 / 0.62);
-  --sur-hero-faible: rgb(255 255 255 / 0.16);
+  --sur-hero-doux: rgb(255 255 255 / 0.85);
+  --sur-hero-faible: rgb(255 255 255 / 0.22);
 
-  /* S'inverse : un bouton noir serait invisible sur un fond noir. */
-  --action: #ededef;
-  --sur-action: #17161b;
+  /* --- Action forte & Boutons -------------------------------------------- */
+  --action: #f1f2f6;
+  --sur-action: #111216;
 
-  /* Le bleu de marque tombe a 3,1:1 sur ce fond. Eclairci d'un cran pour
-     repasser au-dessus du seuil, tout en gardant la meme teinte. */
+  /* --- Accent Brand & Lueur Luminescente Sombre -------------------------- */
   --accent: #5b9bf5;
-  --accent-presse: #4a86dd;
-  --sur-accent: #10161f;
+  --accent-presse: #4386e8;
+  --sur-accent: #0a111a;
+  --accent-glow: 0 4px 24px rgba(91, 155, 245, 0.35);
+  --lueur-accent: var(--accent-glow);
+  --lueur-hero: 0 12px 40px -8px rgba(18, 33, 55, 0.65);
 
+  /* --- Couleurs de données & Visualiseurs --------------------------------- */
   --cyan: #22d3f5;
-  --gris-data: #3a3942;
+  --gris-data: #373843;
 
+  /* --- Statuts & Badges -------------------------------------------------- */
   --vert: #4ade80;
   --vert-clair: #14532d;
-
   --rouge: #f87171;
   --rouge-clair: #450a0a;
 
-  /* Sur carte claire (sombre) : le vert et le rouge du theme sont deja
-     eclaircis, donc lisibles tels quels. Les `-hero` restent ceux du :root. */
+  /* --- Variations Tendance (Delta) --------------------------------------- */
   --delta-haut: var(--vert);
   --delta-bas: var(--rouge);
 
-  --ombre-carte: 0 1px 2px rgb(0 0 0 / 0.4);
-  --ombre-flottant: 0 8px 24px rgb(0 0 0 / 0.55);
-  --voile: rgb(0 0 0 / 0.62);
+  /* --- Ombres Douces de Profondeur & Voiles ------------------------------- */
+  --ombre-carte: 0 1px 3px rgba(0, 0, 0, 0.45), 0 8px 20px -6px rgba(0, 0, 0, 0.55);
+  --ombre-elevated: 0 4px 16px rgba(0, 0, 0, 0.65), 0 20px 40px -10px rgba(0, 0, 0, 0.75);
+  --ombre-flottant: 0 8px 30px -4px rgba(0, 0, 0, 0.75), 0 0 24px rgba(91, 155, 245, 0.18);
+  --ombre-verre: 0 8px 32px 0 rgba(0, 0, 0, 0.55);
+  --voile: rgb(0 0 0 / 0.72);
 }

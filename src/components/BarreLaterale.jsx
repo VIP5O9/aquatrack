@@ -17,16 +17,12 @@ import * as M from '../lib/metrics.js'
 import { formatHTG, MONTANT_MASQUE } from '../lib/format.js'
 
 /**
- * Navigation laterale — desktop (>= 1024px).
+ * Navigation latérale — Desktop (>= 1024px) avec esthétique Apple Fluid Glass.
  *
- * Les references ne couvrent que le mobile : cette barre est une extension.
- * Elle reprend le meme vocabulaire — pilule noire pour l'element actif, bleu
- * pour l'action principale, icones fines.
- *
- * Elle porte aussi une synthese du mois. Sur un grand ecran, quatre entrees de
- * menu laissaient plusieurs centaines de pixels de vide ; le remplir par une
- * information utile vaut mieux que d'etirer le menu artificiellement. Les
- * chiffres essentiels restent alors visibles depuis n'importe quel ecran.
+ * Translucide avec flou optique (backdrop-filter: blur(20px) saturate(180%)),
+ * délimitation droite sous-pixel et éclairage rim-light.
+ * Contient les liens de navigation principaux, la synthèse mensuelle en direct,
+ * le verrouillage rapide et le sélecteur de thème tactile.
  */
 const ONGLETS = [
   { to: '/tableau-de-bord', libelle: 'Accueil', icone: Home },
@@ -59,40 +55,45 @@ export default function BarreLaterale() {
 
   return (
     <aside
-      className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col lg:flex"
-      style={{ background: 'var(--surface)', borderRight: '1px solid var(--bordure)' }}
+      className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col select-none lg:flex"
+      style={{
+        background: 'var(--glass-material)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        borderRight: '1px solid var(--border-subtle)',
+        boxShadow: 'var(--rim-light)',
+      }}
     >
       <div className="flex flex-1 flex-col overflow-y-auto p-5">
+        {/* --- Marque & Identité --- */}
         <div className="mb-6 flex items-center gap-2.5">
           <span
-            className="grid size-9 place-items-center rounded-[10px]"
-            style={{ background: 'var(--accent)', color: 'var(--sur-accent)' }}
+            className="grid size-9 place-items-center rounded-[12px] shadow-sm"
+            style={{
+              background: 'var(--hero-gradient)',
+              color: 'var(--sur-hero)',
+              boxShadow: 'var(--lueur-accent)',
+            }}
           >
-            <Droplet size={19} strokeWidth={2} fill="currentColor" />
+            <Droplet size={19} strokeWidth={2.2} fill="currentColor" />
           </span>
-          <span className="text-[15px] leading-tight font-medium">
+          <span className="text-[15px] leading-tight font-medium tracking-tight">
             Aqua Track
-            <span className="block text-[11px]" style={{ color: 'var(--texte-doux)' }}>
+            <span className="block text-[11px] font-normal" style={{ color: 'var(--texte-doux)' }}>
               Gestion de kiosque
             </span>
           </span>
         </div>
 
-        {/* Aucun bouton d'action ici : il vit desormais dans l'en-tete de
-            page. Deux pilules pleine largeur empilees se disputaient
-            l'attention, et l'onglet actif y perdait son role d'indicateur de
-            position. La barre laterale ne fait plus que naviguer et informer. */}
-        <nav>
-          <ul className="flex flex-col gap-1">
+        {/* --- Navigation --- */}
+        <nav aria-label="Navigation latérale">
+          <ul className="flex flex-col gap-1.5">
             {ONGLETS.map((o) => (
               <li key={o.to}>
                 <NavLink
                   to={o.to}
-                  // Le fond actif reste en ligne, mais PAS le fond inactif :
-                  // un style en ligne bat toujours une classe, et « transparent »
-                  // aurait annule le survol.
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-full px-4 py-2.5 text-sm transition-[background-color,color] duration-200 ease-out ${
+                    `group flex items-center gap-3 rounded-full px-4 py-2.5 text-sm transition-all duration-150 active:scale-[0.98] ${
                       isActive ? '' : 'hover:bg-[var(--surface-doux)]'
                     }`
                   }
@@ -100,12 +101,17 @@ export default function BarreLaterale() {
                     background: isActive ? 'var(--action)' : undefined,
                     color: isActive ? 'var(--sur-action)' : 'var(--texte-doux)',
                     fontWeight: isActive ? 500 : 400,
+                    boxShadow: isActive ? 'var(--rim-light-subtle)' : undefined,
                   })}
                 >
                   {({ isActive }) => (
                     <>
-                      <o.icone size={19} strokeWidth={isActive ? 2.25 : 1.75} />
-                      {o.libelle}
+                      <o.icone
+                        size={19}
+                        strokeWidth={isActive ? 2.25 : 1.75}
+                        className="transition-transform duration-150 group-hover:scale-105"
+                      />
+                      <span>{o.libelle}</span>
                     </>
                   )}
                 </NavLink>
@@ -114,19 +120,26 @@ export default function BarreLaterale() {
           </ul>
         </nav>
 
-        {/* --- Synthese du mois -------------------------------------------- */}
-        <section className="mt-6 rounded-[16px] p-4" style={{ background: 'var(--surface-doux)' }}>
-          <p className="text-[11px] tracking-wide uppercase" style={{ color: 'var(--texte-doux)' }}>
+        {/* --- Synthèse du mois -------------------------------------------- */}
+        <section
+          className="mt-6 rounded-[18px] p-4"
+          style={{
+            background: 'var(--surface-doux)',
+            border: '1px solid var(--border-subtle)',
+            boxShadow: 'var(--rim-light-subtle)',
+          }}
+        >
+          <p className="text-[11px] font-medium tracking-wider uppercase" style={{ color: 'var(--texte-doux)' }}>
             Ce mois
           </p>
-          <p className="chiffres mt-1.5 text-[22px] leading-none font-medium">
+          <p className="chiffres mt-1.5 text-[22px] leading-none font-medium tracking-tight">
             {montantsCaches ? MONTANT_MASQUE : formatHTG(resume.net)}
           </p>
           <p className="sous-ligne mt-1">bénéfice net</p>
 
           <div
             className="mt-3.5 flex items-baseline justify-between gap-2 pt-3.5"
-            style={{ borderTop: '1px solid var(--bordure)' }}
+            style={{ borderTop: '1px solid var(--border-subtle)' }}
           >
             <span className="sous-ligne">En stock</span>
             <span className="chiffres text-sm font-medium">
@@ -137,8 +150,6 @@ export default function BarreLaterale() {
             <p
               className="mt-0.5 text-right text-[11px]"
               style={{
-                // Sous trois jours d'autonomie, la ligne passe en texte plein :
-                // c'est le seul moment ou elle doit accrocher l'oeil.
                 color: resume.jours < 3 ? 'var(--texte)' : 'var(--texte-doux)',
                 fontWeight: resume.jours < 3 ? 500 : 400,
               }}
@@ -152,20 +163,29 @@ export default function BarreLaterale() {
       </div>
 
       {/* --- Pied : actions rapides --------------------------------------- */}
-      <div className="p-5 pt-4" style={{ borderTop: '1px solid var(--bordure)' }}>
+      <div
+        className="p-5 pt-4"
+        style={{
+          borderTop: '1px solid var(--border-subtle)',
+          background: 'var(--glass-material-subtil)',
+        }}
+      >
         {etat.reglages.verrou_actif && (
           <button
             onClick={() => {
-              // Verrouille sur-le-champ, sans attendre le delai configure :
-              // c'est le geste qu'on fait en quittant le comptoir.
               applicationMasquee()
               useStore.setState({ verrouille: true })
             }}
-            className="mb-3 flex w-full items-center gap-2.5 rounded-[12px] px-3 py-2.5 text-[13px] transition-colors"
-            style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
+            className="mb-3 flex w-full items-center gap-2.5 rounded-[14px] px-3.5 py-2.5 text-[13px] font-medium transition-all active:scale-[0.98]"
+            style={{
+              background: 'var(--surface-doux)',
+              color: 'var(--texte-doux)',
+              border: '1px solid var(--border-subtle)',
+              boxShadow: 'var(--rim-light-subtle)',
+            }}
           >
             <Lock size={15} strokeWidth={1.75} />
-            Verrouiller maintenant
+            <span>Verrouiller maintenant</span>
           </button>
         )}
 
@@ -174,7 +194,10 @@ export default function BarreLaterale() {
 
           <div
             className="flex gap-0.5 rounded-full p-0.5"
-            style={{ background: 'var(--surface-doux)' }}
+            style={{
+              background: 'var(--surface-doux)',
+              border: '1px solid var(--border-subtle)',
+            }}
           >
             {THEMES.map((t) => {
               const actif = themeMode === t.valeur
@@ -185,10 +208,11 @@ export default function BarreLaterale() {
                   title={t.titre}
                   aria-label={t.titre}
                   aria-pressed={actif}
-                  className="grid size-7 place-items-center rounded-full transition-colors"
+                  className="grid size-7 place-items-center rounded-full transition-all active:scale-90"
                   style={{
                     background: actif ? 'var(--action)' : 'transparent',
                     color: actif ? 'var(--sur-action)' : 'var(--texte-doux)',
+                    boxShadow: actif ? 'var(--rim-light-subtle)' : undefined,
                   }}
                 >
                   <t.icone size={13} strokeWidth={2} />

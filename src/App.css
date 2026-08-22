@@ -1,0 +1,87 @@
+/* ===========================================================================
+   Aqua Track — App-Level Motion & Glass Architecture (Emil Kowalski Standards)
+   =========================================================================== */
+
+/* --- Motion Spring Curves ------------------------------------------------ */
+:root {
+  --spring-duration-enter: 0.32s;
+  --spring-duration-sheet: 0.28s;
+  --spring-duration-tactile: 0.12s;
+}
+
+/* --- GPU-Accelerated Hardware Layering ----------------------------------- */
+.gpu-accel {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* --- Tactile Press Feedbacks --------------------------------------------- */
+.tactile-press {
+  transition: transform var(--spring-duration-tactile) var(--transition-ui),
+              opacity var(--spring-duration-tactile) var(--transition-ui),
+              box-shadow var(--spring-duration-tactile) var(--transition-ui);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.tactile-press:active {
+  transform: scale(0.97);
+}
+
+.tactile-press-subtil {
+  transition: transform var(--spring-duration-tactile) var(--transition-ui),
+              opacity var(--spring-duration-tactile) var(--transition-ui);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tactile-press-subtil:active {
+  transform: scale(0.985);
+}
+
+.tactile-press-accent {
+  transition: transform var(--spring-duration-tactile) var(--transition-ui),
+              filter var(--spring-duration-tactile) var(--transition-ui),
+              box-shadow var(--spring-duration-tactile) var(--transition-ui);
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tactile-press-accent:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
+}
+
+/* --- Glassmorphic Containers --------------------------------------------- */
+.glass-nav {
+  background: var(--glass-material);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light);
+}
+
+.glass-header {
+  background: var(--glass-material-subtil);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light-subtle);
+}
+
+.glass-sheet {
+  background: var(--surface-elevated);
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light-elevated), var(--ombre-elevated);
+}
+
+.glass-pill {
+  background: var(--glass-material-subtil);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light-subtle);
+}

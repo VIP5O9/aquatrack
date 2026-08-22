@@ -1,38 +1,32 @@
 import { useMemo, useState } from 'react'
-import { ScrollText, Search, X, Download, Check } from 'lucide-react'
+import { ScrollText, Search, X } from 'lucide-react'
 import EnTete from '../components/EnTete.jsx'
 import SegmentPills from '../components/SegmentPills.jsx'
 import EtatVide from '../components/EtatVide.jsx'
 import LigneJournal, { versLigne } from '../components/LigneJournal.jsx'
 import VueCalendrier from '../components/VueCalendrier.jsx'
 import SelecteurMois from '../components/SelecteurMois.jsx'
+import FiltresJournal, { BoutonExport, FILTRES_BASE } from '../components/FiltresJournal.jsx'
 import { useStore, useEtat } from '../store/useStore.js'
 import { exporterExcelFiltre } from '../lib/echange.js'
 import { formatHTG, cleJour, normaliser, MONTANT_MASQUE } from '../lib/format.js'
 
 /**
- * Journal des operations.
+ * Journal des opérations.
  *
- * Deux vues qui ne repondent pas a la meme question :
+ * Deux vues qui ne répondent pas à la même question :
  *
- *   - LISTE : « qu'est-ce que j'ai fait ? » — le detail chronologique, avec
- *     le montant et la categorie de chaque ligne.
- *   - CALENDRIER : « qu'est-ce qui manque ? » — une journee oubliee disparait
+ *   - LISTE : « qu'est-ce que j'ai fait ? » — le détail chronologique, avec
+ *     le montant et la catégorie de chaque ligne.
+ *   - CALENDRIER : « qu'est-ce qui manque ? » — une journée oubliée disparaît
  *     d'une liste, mais saute aux yeux dans une grille.
  *
- * Les deux partagent le mois consulte, pour qu'on puisse basculer de l'une a
+ * Les deux partagent le mois consulté, pour qu'on puisse basculer de l'une à
  * l'autre sans se reperdre.
  */
 const VUES = [
   { valeur: 'liste', libelle: 'Liste' },
   { valeur: 'calendrier', libelle: 'Calendrier' },
-]
-
-/** Filtres fixes ; les catégories s'y ajoutent dynamiquement à l'affichage. */
-const FILTRES_BASE = [
-  { valeur: 'tout', libelle: 'Tout' },
-  { valeur: 'revenu', libelle: 'Revenus' },
-  { valeur: 'depense', libelle: 'Dépenses' },
 ]
 
 export default function Journal() {
@@ -47,8 +41,8 @@ export default function Journal() {
   const [filtre, setFiltre] = useState('tout')
   const [recherche, setRecherche] = useState('')
   const maintenant = new Date()
-  // La periode consultee est une PLAGE de mois : { debut, fin }, chacun
-  // { annee, mois }. Un seul mois se represente par debut === fin.
+  // La période consultée est une PLAGE de mois : { debut, fin }, chacun
+  // { annee, mois }. Un seul mois se représente par debut === fin.
   const moisCourant = { annee: maintenant.getFullYear(), mois: maintenant.getMonth() }
   const [plage, setPlage] = useState({ debut: moisCourant, fin: moisCourant })
 
@@ -90,11 +84,11 @@ export default function Journal() {
       <ChampRecherche valeur={recherche} onChange={setRecherche} />
 
       {/* Vue et mois n'ont plus cours pendant une recherche : elle traverse
-          tous les mois. On les retire plutot que de les laisser inertes. */}
+          tous les mois. On les retire plutôt que de les laisser inertes. */}
       {!enRecherche && (
         <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center">
-          {/* Le choix Liste / Calendrier disparait sur une plage de plusieurs
-              mois : le calendrier ne montre qu'un mois a la fois. */}
+          {/* Le choix Liste / Calendrier disparaît sur une plage de plusieurs
+              mois : le calendrier ne montre qu'un mois à la fois. */}
           {!plageMultiple && (
             <SegmentPills options={VUES} valeur={vue} onChange={setVue} className="lg:w-64" />
           )}
@@ -109,21 +103,21 @@ export default function Journal() {
         </div>
       )}
 
-      {/* Synthese : le mois consulte, ou le total des resultats en recherche.
+      {/* Synthèse : le mois consulté, ou le total des résultats en recherche.
           Sans elle, changer de mois — ou lancer une recherche — ne dirait rien
           tant qu'on n'a pas parcouru toute la liste. */}
       <section className="carte mb-3">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
             {enRecherche ? 'Net des résultats' : plageMultiple ? 'Net de la période' : 'Net du mois'}
           </span>
-          <span className="chiffre-stat">{m(formatHTG(d.net))}</span>
+          <span className="chiffre-stat tracking-tight">{m(formatHTG(d.net))}</span>
         </div>
         <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3">
-          <span className="sous-ligne">
+          <span className="sous-ligne text-xs">
             {m(formatHTG(d.revenus))} encaissés · {m(formatHTG(d.totalDepenses))} dépensés
           </span>
-          <span className="sous-ligne">
+          <span className="sous-ligne text-xs">
             {enRecherche
               ? `${d.lignes.length} résultat${d.lignes.length > 1 ? 's' : ''}`
               : `${d.nbCloturees} jour${d.nbCloturees > 1 ? 's' : ''} clôturé${d.nbCloturees > 1 ? 's' : ''}`}
@@ -144,7 +138,7 @@ export default function Journal() {
         </section>
       ) : (
         <>
-          <BarreFiltres
+          <FiltresJournal
             filtre={filtreEffectif}
             onChange={setFiltre}
             categories={etat.categories}
@@ -165,7 +159,7 @@ export default function Journal() {
           />
 
           {d.lignes.length === 0 ? (
-            <div className="carte">
+            <div className="carte anim-vue">
               <EtatVide
                 icone={enRecherche ? Search : ScrollText}
                 titre={enRecherche ? 'Aucun résultat' : 'Aucune opération ce mois-ci'}
@@ -207,96 +201,10 @@ export default function Journal() {
 }
 
 /**
- * Barre de filtres.
- *
- * Deux natures de filtre, donc deux groupes SÉPARÉS par un trait : d'abord la
- * nature de l'opération (tout / revenus / dépenses), puis les catégories. Sans
- * cette césure, tout s'alignait à plat et « Bouchon » se lisait comme s'il
- * était de même rang que « Revenus ». Chaque catégorie porte sa pastille de
- * couleur, la même qu'ailleurs dans l'app — on la reconnaît d'un coup d'œil.
- */
-function BarreFiltres({ filtre, onChange, categories, action }) {
-  const pastille = (valeur, libelle, couleur) => {
-    const actif = valeur === filtre
-    return (
-      <button
-        key={valeur}
-        onClick={() => onChange(valeur)}
-        aria-pressed={actif}
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] whitespace-nowrap transition-colors"
-        style={{
-          background: actif ? 'var(--action)' : 'var(--surface-doux)',
-          color: actif ? 'var(--sur-action)' : 'var(--texte-doux)',
-          fontWeight: actif ? 500 : 400,
-        }}
-      >
-        {couleur && (
-          <span
-            aria-hidden="true"
-            className="size-2 shrink-0 rounded-full"
-            // Sur une pastille active (fond sombre), une couleur foncée
-            // dispararaîtrait : on passe alors au blanc.
-            style={{ background: actif ? 'var(--sur-action)' : couleur }}
-          />
-        )}
-        {libelle}
-      </button>
-    )
-  }
-
-  return (
-    <div className="mb-3 flex items-center gap-2">
-      {/* Les filtres defilent horizontalement ; l'action d'export reste
-          ancrée à droite, hors du defilement, toujours atteignable. */}
-      <div className="defile-x flex items-center gap-2 pb-1">
-        {FILTRES_BASE.map((f) => pastille(f.valeur, f.libelle))}
-        {categories.length > 0 && (
-          <span
-            aria-hidden="true"
-            className="mx-0.5 h-5 w-px shrink-0"
-            style={{ background: 'var(--bordure)' }}
-          />
-        )}
-        {categories.map((c) => pastille(`cat:${c.id}`, c.nom, c.color))}
-      </div>
-      {action && <div className="shrink-0">{action}</div>}
-    </div>
-  )
-}
-
-/**
- * Bouton d'export Excel du journal filtre.
- *
- * Un bref « Exporté ✓ » confirme le telechargement : sur telephone, rien ne
- * dit qu'un fichier est parti si l'ecran ne bronche pas.
- */
-function BoutonExport({ onExport, disabled }) {
-  const [fait, setFait] = useState(false)
-  return (
-    <button
-      onClick={() => {
-        const r = onExport()
-        if (r) {
-          setFait(true)
-          setTimeout(() => setFait(false), 2200)
-        }
-      }}
-      disabled={disabled}
-      aria-label="Exporter en Excel"
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] transition-colors disabled:opacity-40"
-      style={{ background: 'var(--surface-doux)', color: fait ? 'var(--vert)' : 'var(--texte-doux)' }}
-    >
-      {fait ? <Check size={15} strokeWidth={2.25} /> : <Download size={15} strokeWidth={2} />}
-      <span className="hidden sm:inline">{fait ? 'Exporté' : 'Excel'}</span>
-    </button>
-  )
-}
-
-/**
  * Champ de recherche.
  *
- * Une croix apparait des qu'on a tape : effacer une recherche au doigt, lettre
- * par lettre, est penible — un seul appui doit suffire a revenir a la liste.
+ * Une croix apparaît dès qu'on a tapé : effacer une recherche au doigt, lettre
+ * par lettre, est pénible — un seul appui doit suffire à revenir à la liste.
  */
 function ChampRecherche({ valeur, onChange }) {
   return (
@@ -314,7 +222,7 @@ function ChampRecherche({ valeur, onChange }) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="Rechercher un article, une catégorie, un montant…"
         aria-label="Rechercher dans le journal"
-        className="w-full rounded-[16px] py-3 pr-11 pl-11 text-sm outline-none"
+        className="w-full rounded-[16px] py-3 pr-11 pl-11 text-sm outline-none transition-all focus:ring-2 focus:ring-[var(--accent)]/30"
         style={{ background: 'var(--surface-doux)' }}
       />
       {valeur && (
@@ -322,7 +230,7 @@ function ChampRecherche({ valeur, onChange }) {
           type="button"
           onClick={() => onChange('')}
           aria-label="Effacer la recherche"
-          className="absolute top-1/2 right-2.5 grid size-7 -translate-y-1/2 place-items-center rounded-full"
+          className="tactile-press absolute top-1/2 right-2.5 grid size-7 -translate-y-1/2 place-items-center rounded-full transition-transform active:scale-90"
           style={{ color: 'var(--texte-doux)' }}
         >
           <X size={16} strokeWidth={2} />
@@ -333,18 +241,11 @@ function ChampRecherche({ valeur, onChange }) {
 }
 
 /**
- * Recherche a travers TOUT l'historique, tous mois confondus.
+ * Recherche à travers TOUT l'historique, tous mois confondus.
  *
- * Retrouver « les bouchons » ne doit pas obliger a se souvenir du mois de
+ * Retrouver « les bouchons » ne doit pas obliger à se souvenir du mois de
  * l'achat : c'est justement quand on ne sait plus quand qu'on cherche. Le
- * filtre de type (revenus / depenses) reste applique, lui.
- */
-/**
- * Construit et trie les lignes d'affichage, selon le filtre.
- *
- * `filtre` vaut « tout », « revenu », « depense », ou « cat:<id> » pour ne
- * garder que les dépenses d'une catégorie. Un filtre de catégorie n'inclut
- * jamais les revenus — une recette n'a pas de catégorie de dépense.
+ * filtre de type (revenus / dépenses) reste appliqué, lui.
  */
 function construireLignes(journees, depenses, etat, filtre) {
   const estCat = filtre.startsWith('cat:')
@@ -398,8 +299,8 @@ function filtrerPlage(etat, plage, filtre) {
 }
 
 /* --- Export : quoi exporter, sous quel nom, selon le filtre courant --------
-   Le fichier reflete exactement ce qui est a l'ecran. Un filtre « Revenus »
-   n'exporte que les recettes ; un filtre de categorie, que ses depenses. */
+   Le fichier reflète exactement ce qui est à l'écran. Un filtre « Revenus »
+   n'exporte que les recettes ; un filtre de catégorie, que ses dépenses. */
 
 const moisCle = (x) => `${x.annee}-${String(x.mois + 1).padStart(2, '0')}`
 const cleDePlage = (p) => `${moisCle(p.debut)}_${moisCle(p.fin)}`
@@ -417,7 +318,7 @@ function depensesAExporter(d, filtre) {
   return d.depenses
 }
 
-/** Suffixe de nom de fichier : periode + intitule du filtre, en clair. */
+/** Suffixe de nom de fichier : période + intitulé du filtre, en clair. */
 function suffixeExport(plage, filtre, categories) {
   let s = moisCle(plage.debut)
   if (plage.debut.annee !== plage.fin.annee || plage.debut.mois !== plage.fin.mois) {
@@ -432,10 +333,11 @@ function suffixeExport(plage, filtre, categories) {
   return s
 }
 
-/** Annees pour lesquelles il existe au moins une operation. */
+/** Années pour lesquelles il existe au moins une opération. */
 function anneesAvecDonnees(etat) {
   const s = new Set()
   for (const j of etat.journees) s.add(Number(j.date.slice(0, 4)))
   for (const x of etat.depenses) s.add(new Date(x.occurred_at).getFullYear())
   return [...s]
 }
+

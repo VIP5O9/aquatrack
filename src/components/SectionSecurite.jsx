@@ -102,8 +102,8 @@ export default function SectionSecurite() {
       titre="Sécurité"
       aide="Ce verrou protège contre quelqu'un qui prend le téléphone en main. Il ne chiffre pas vos données : gardez aussi le téléphone protégé par le verrouillage du système."
     >
-      <div className="px-3.5 py-4">
-        <p className="sous-ligne mb-4">
+      <div className="px-4 py-4">
+        <p className="sous-ligne mb-4 leading-relaxed">
           Un code à 4 chiffres protège vos chiffres quand le téléphone reste posé sur le
           comptoir.
         </p>
@@ -122,8 +122,8 @@ export default function SectionSecurite() {
           ) : (
             <button
               onClick={() => setEtape('nouveau')}
-              className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-sm transition-colors outline-none hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
-              style={{ background: 'var(--surface-doux)' }}
+              className="tactile-press flex w-full items-center gap-3.5 rounded-[16px] border border-[var(--border-subtle)] px-3.5 py-3 text-left text-sm font-medium shadow-sm transition-all outline-none hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+              style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
             >
               <ChipIcone icone={Lock} />
               Activer le verrouillage
@@ -132,15 +132,15 @@ export default function SectionSecurite() {
         ) : (
           <div className="flex flex-col gap-5">
             <div
-              className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm"
-              style={{ background: 'var(--surface-doux)' }}
+              className="flex items-center gap-3 rounded-[16px] border border-[var(--border-subtle)] px-3.5 py-3 text-sm font-medium shadow-sm"
+              style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
             >
               <ChipIcone icone={ShieldCheck} couleur="var(--vert)" />
               Verrouillage actif
             </div>
 
             <div>
-              <p className="mb-2 text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+              <p className="mb-2 text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
                 Verrouiller après une inactivité de
               </p>
               <SegmentPills
@@ -158,7 +158,7 @@ export default function SectionSecurite() {
             {capteur && (
               <label className="flex cursor-pointer items-start justify-between gap-3">
                 <span className="min-w-0">
-                  <span className="flex items-center gap-2 text-sm">
+                  <span className="flex items-center gap-2 text-sm font-medium">
                     <Fingerprint size={16} strokeWidth={1.75} />
                     Empreinte ou visage
                   </span>
@@ -185,7 +185,7 @@ export default function SectionSecurite() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <button
                   onClick={verrouiller}
-                  className="flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)]"
+                  className="tactile-press-accent flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-medium shadow-sm outline-none transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--surface)]"
                   style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
                 >
                   <Lock size={15} strokeWidth={2} />
@@ -193,7 +193,7 @@ export default function SectionSecurite() {
                 </button>
                 <button
                   onClick={() => setEtape('retirer')}
-                  className="rounded text-[13px] text-[var(--texte-doux)] underline underline-offset-2 outline-none transition-colors hover:text-[var(--rouge)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                  className="tactile-press rounded-lg px-2 py-1 text-[13px] font-medium text-[var(--texte-doux)] underline underline-offset-2 outline-none transition-colors hover:text-[var(--rouge)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                 >
                   Désactiver
                 </button>
@@ -221,10 +221,10 @@ export default function SectionSecurite() {
 function PanneauCode({ titre, etape, onComplete, erreur, onErreurFin, erreurTexte, onAnnuler }) {
   return (
     <div
-      className="flex flex-col items-center rounded-[16px] px-3.5 py-5"
-      style={{ background: 'var(--surface-doux)' }}
+      className="flex flex-col items-center rounded-[20px] border border-[var(--border-subtle)] px-4 py-5 shadow-sm"
+      style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
     >
-      <p className="mb-3 text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+      <p className="mb-3 text-[13px] font-medium tracking-tight" style={{ color: 'var(--texte-doux)' }}>
         {titre}
       </p>
       <PaveCode
@@ -237,7 +237,7 @@ function PanneauCode({ titre, etape, onComplete, erreur, onErreurFin, erreurText
       />
       <button
         onClick={onAnnuler}
-        className="mt-3 rounded px-2 text-[13px] text-[var(--texte-doux)] outline-none transition-colors hover:text-[var(--texte)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+        className="tactile-press mt-3 rounded-full px-3 py-1.5 text-[13px] font-medium text-[var(--texte-doux)] outline-none transition-colors hover:text-[var(--texte)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
       >
         Annuler
       </button>

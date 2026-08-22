@@ -2,42 +2,35 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 
 /**
- * Conteneur de saisie adaptatif.
+ * Conteneur de saisie adaptatif — Apple Fluid Glass & Emil Kowalski Spring Physics.
  *
- * Un seul composant, deux habillages :
- *   - mobile  : feuille montant du bas, poignee, coins arrondis en haut
- *   - desktop : modale centree de 440px
+ * Deux habillages selon le viewport :
+ *   - Mobile (< 1024px) : Tiroir montant du bas (bottom sheet), poignée de tirage,
+ *     suivi direct du doigt et seuils de vitesse/distance pour fermeture par glissement.
+ *   - Desktop (>= 1024px) : Modale en verre surélevée (440px), centrée avec flou d'arrière-plan.
  *
- * Le contenu est rigoureusement identique — seul le contenant change. C'est
- * la regle tenue partout dans l'app : la mise en page s'adapte, jamais les
- * composants.
- *
- * SUR MOBILE, on ferme aussi la feuille en la faisant GLISSER vers le bas —
- * le geste attendu d'un « bottom sheet ». Le suivi n'ecoute que le tactile,
- * donc la souris de bureau n'est jamais concernee : la modale centree garde
- * le X, le clic sur le fond et Echap.
+ * Animation basée sur la courbe ressort `--transition-tiroir` : `cubic-bezier(0.32, 0.72, 0, 1)`.
  */
 
-// Au-dela de cette distance (ou d'un flick rapide), le relachement ferme.
+// Au-delà de cette distance (ou d'un flick rapide), le relâchement ferme.
 const SEUIL_FERMETURE = 110
 const SEUIL_VITESSE = 0.6 // px/ms
 
 export default function Feuille({ titre, onFermer, children, pied }) {
   const panneau = useRef(null)
-  const contenu = useRef(null) // zone defilante, pour lire scrollTop
-  const haut = useRef(null) // poignee + en-tete : zone toujours « tirable »
-  const geste = useRef(null) // etat du geste en cours (hors rendu)
+  const contenu = useRef(null) // zone défilante, pour lire scrollTop
+  const haut = useRef(null) // poignée + en-tête : zone toujours « tirable »
+  const geste = useRef(null) // état du geste en cours (hors rendu)
 
-  // `tirage` : deplacement vertical courant (px) pendant le glissement.
+  // `tirage` : déplacement vertical courant (px) pendant le glissement.
   // `sortie` : true quand on lance l'animation de fermeture vers le bas.
-  // `aInteragi` : des qu'on a tire une fois, on n'ARME plus l'animation
+  // `aInteragi` : dès qu'on a tiré une fois, on n'ARME plus l'animation
   // d'ouverture — sinon un retour-ressort rejouerait « montee ».
   const [tirage, setTirage] = useState(0)
   const [sortie, setSortie] = useState(false)
   const [aInteragi, setAInteragi] = useState(false)
 
-  // Echap ferme, et le defilement de la page est gele pendant l'ouverture :
-  // sans cela, sur mobile, le fond defile sous la feuille.
+  // Échap ferme, et le défilement de la page est gelé pendant l'ouverture
   useEffect(() => {
     const auClavier = (e) => e.key === 'Escape' && onFermer()
     document.addEventListener('keydown', auClavier)
@@ -50,9 +43,7 @@ export default function Feuille({ titre, onFermer, children, pied }) {
     }
   }, [onFermer])
 
-  // Glissement-fermeture. Les ecouteurs sont poses A LA MAIN : `touchmove` doit
-  // etre NON passif pour que preventDefault() empeche le rebond de page — les
-  // onTouchMove de React sont passifs et le refusent.
+  // Glissement-fermeture. Écouteurs natifs posés à la main pour touchmove non-passif
   useEffect(() => {
     const el = panneau.current
     if (!el) return
@@ -60,7 +51,7 @@ export default function Feuille({ titre, onFermer, children, pied }) {
     const fermerVersLeBas = () => {
       setSortie(true)
       setTirage((el.offsetHeight || window.innerHeight) * 1.2)
-      setTimeout(onFermer, 200)
+      setTimeout(onFermer, 220)
     }
 
     const onStart = (e) => {
@@ -70,8 +61,6 @@ export default function Feuille({ titre, onFermer, children, pied }) {
       geste.current = {
         y0: e.touches[0].clientY,
         t0: e.timeStamp,
-        // Ne peut FERMER que si le geste part de la zone haute, ou si le
-        // contenu est deja en haut. Sinon on laisse defiler.
         autorise: depuisHaut || enHaut,
         depuisHaut,
         actif: false,
@@ -94,7 +83,7 @@ export default function Feuille({ titre, onFermer, children, pied }) {
         setTirage(0)
       } else {
         if (e.cancelable) e.preventDefault() // stoppe le rebond de page
-        // Legere resistance sur les premiers pixels : la feuille suit le doigt.
+        // Légère résistance sur les premiers pixels : la feuille suit le doigt avec fluidité.
         setTirage(dy < 24 ? dy * 0.6 : dy - 10)
       }
       g.dernierY = e.touches[0].clientY
@@ -130,13 +119,19 @@ export default function Feuille({ titre, onFermer, children, pied }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center lg:items-center">
+      {/* Voile d'arrière-plan avec flou optique */}
       <div
-        className="absolute inset-0 animate-[apparition_.18s_ease-out]"
-        style={{ background: 'rgb(34 32 38 / .45)' }}
+        className="absolute inset-0 animate-[apparition_.2s_ease-out]"
+        style={{
+          background: 'var(--voile)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
         onClick={onFermer}
         aria-hidden="true"
       />
 
+      {/* Conteneur principal de la feuille / modale */}
       <div
         ref={panneau}
         tabIndex={-1}
@@ -144,33 +139,34 @@ export default function Feuille({ titre, onFermer, children, pied }) {
         aria-modal="true"
         aria-label={titre}
         className={[
-          'relative flex max-h-[92vh] w-full touch-pan-y flex-col outline-none',
-          // L'animation d'ouverture ne joue qu'une fois, a l'ouverture. Des
-          // qu'on a tire, c'est le transform en ligne qui gouverne.
-          !aInteragi && !sortie ? 'animate-[montee_.22s_cubic-bezier(.32,.72,0,1)]' : '',
-          'rounded-t-[24px] lg:max-w-[440px] lg:rounded-[24px]',
+          'relative flex max-h-[92vh] w-full touch-pan-y flex-col outline-none select-none',
+          !aInteragi && !sortie ? 'animate-[montee_.24s_cubic-bezier(.32,.72,0,1)]' : '',
+          'rounded-t-[28px] border-t border-[var(--border-subtle)] lg:max-w-[440px] lg:rounded-[28px] lg:border',
         ].join(' ')}
         style={{
-          background: 'var(--surface)',
+          background: 'var(--surface-elevated)',
+          boxShadow: 'var(--rim-light-elevated), var(--ombre-elevated)',
           transform: `translateY(${tirage}px)`,
-          // Pas de transition PENDANT le tir (suivi direct) ; transition au
-          // relachement (retour-ressort) et a la sortie.
-          transition: geste.current?.actif ? 'none' : 'transform .22s cubic-bezier(.32,.72,0,1)',
+          transition: geste.current?.actif ? 'none' : 'transform .24s cubic-bezier(.32,.72,0,1)',
         }}
       >
-        {/* Poignee + en-tete : zone toujours « tirable », meme contenu defile. */}
+        {/* Poignée + en-tête */}
         <div ref={haut}>
-          {/* Poignee : affordance de glissement, mobile uniquement. */}
-          <div className="flex justify-center pt-2.5 lg:hidden" aria-hidden="true">
-            <span className="h-1 w-9 rounded-full" style={{ background: 'var(--bordure)' }} />
+          {/* Poignée de glissement tactile (mobile uniquement) */}
+          <div className="flex justify-center pt-3 pb-1 lg:hidden" aria-hidden="true">
+            <span
+              className="h-1.5 w-10 rounded-full transition-colors"
+              style={{ background: 'var(--border-subtle)', opacity: 0.8 }}
+            />
           </div>
 
-          <header className="flex items-center justify-between px-5 pt-4 pb-2">
-            <h2 className="text-[17px] font-medium">{titre}</h2>
+          <header className="flex items-center justify-between px-6 pt-3 pb-2">
+            <h2 className="text-[18px] font-semibold tracking-tight">{titre}</h2>
             <button
               onClick={onFermer}
               aria-label="Fermer"
-              className="-m-2 rounded-full p-2 transition-colors"
+              type="button"
+              className="-m-2 rounded-full p-2 transition-all duration-150 hover:bg-[var(--surface-doux)] active:scale-90"
               style={{ color: 'var(--texte-doux)' }}
             >
               <X size={20} strokeWidth={2} />
@@ -178,16 +174,18 @@ export default function Feuille({ titre, onFermer, children, pied }) {
           </header>
         </div>
 
-        <div ref={contenu} className="flex-1 overflow-y-auto px-5 pb-2">
+        {/* Zone de contenu défilante */}
+        <div ref={contenu} className="flex-1 overflow-y-auto px-6 pb-3">
           {children}
         </div>
 
+        {/* Pied de feuille optionnel */}
         {pied && (
           <footer
-            className="px-5 pt-3 pb-5"
+            className="px-6 pt-3 pb-6"
             style={{
-              borderTop: '1px solid var(--bordure)',
-              paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
+              borderTop: '1px solid var(--border-subtle)',
+              paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
             }}
           >
             {pied}
@@ -198,15 +196,19 @@ export default function Feuille({ titre, onFermer, children, pied }) {
   )
 }
 
-/** Bouton principal des feuilles : noir, pleine largeur — comme le brief. */
+/** Bouton principal des feuilles : action pleine largeur avec retour tactile */
 export function BoutonPrincipal({ children, disabled, onClick, type = 'button' }) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-full py-3.5 text-sm font-medium transition-transform active:scale-[0.99] disabled:opacity-35"
-      style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
+      className="tactile-press group flex w-full items-center justify-center rounded-full py-3.5 text-sm font-medium transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-35"
+      style={{
+        background: 'var(--action)',
+        color: 'var(--sur-action)',
+        boxShadow: 'var(--rim-light-subtle)',
+      }}
     >
       {children}
     </button>

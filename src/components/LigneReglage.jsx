@@ -25,15 +25,16 @@ export function ChipIcone({ icone: Icone, danger = false, couleur }) {
   if (!Icone) return null
   return (
     <span
-      className="grid size-8 shrink-0 place-items-center rounded-[9px]"
+      className="grid size-8 shrink-0 place-items-center rounded-[10px] transition-transform duration-150 group-hover:scale-105"
       style={{
         background: danger
           ? 'color-mix(in srgb, var(--rouge) 14%, transparent)'
           : 'var(--surface-doux)',
         color: danger ? 'var(--rouge)' : (couleur ?? 'var(--texte-doux)'),
+        boxShadow: 'var(--rim-light-subtle)',
       }}
     >
-      <Icone size={16.5} strokeWidth={1.75} />
+      <Icone size={16.5} strokeWidth={1.8} />
     </span>
   )
 }
@@ -43,17 +44,20 @@ export function GroupeReglage({ titre, children, aide }) {
   return (
     <section>
       {titre && (
-        <h2 className="mb-1.5 px-1 text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
+        <h2 className="mb-2 px-1 text-[13px] font-medium tracking-tight" style={{ color: 'var(--texte-doux)' }}>
           {titre}
         </h2>
       )}
       <div
-        className="overflow-hidden rounded-[16px]"
-        style={{ background: 'var(--surface)', border: '1px solid var(--bordure)' }}
+        className="overflow-hidden rounded-[20px] border border-[var(--border-subtle)]"
+        style={{
+          background: 'var(--surface)',
+          boxShadow: 'var(--rim-light), var(--ombre-carte)',
+        }}
       >
         {children}
       </div>
-      {aide && <p className="sous-ligne mt-1.5 px-1">{aide}</p>}
+      {aide && <p className="sous-ligne mt-2 px-1 leading-relaxed">{aide}</p>}
     </section>
   )
 }
@@ -81,30 +85,35 @@ export function LigneReglage({
   return (
     <Comp
       onClick={onClick}
-      className={`flex w-full items-center gap-3 px-3.5 py-3 text-left [&:not(:last-child)]:border-b ${
+      className={`group flex w-full items-center gap-3.5 px-4 py-3.5 text-left [&:not(:last-child)]:border-b ${
         onClick
-          ? 'transition-colors hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]'
+          ? 'tactile-press-subtil transition-colors duration-150 hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]'
           : ''
       }`}
-      style={{ borderColor: 'var(--bordure)' }}
+      style={{ borderColor: 'var(--border-subtle)' }}
     >
       <ChipIcone icone={Icone} danger={danger} />
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm" style={{ color: encre }}>
+        <span className="block truncate text-sm font-medium" style={{ color: encre }}>
           {titre}
         </span>
         {sousTitre && <span className="sous-ligne mt-0.5 block">{sousTitre}</span>}
       </span>
 
       {valeur != null && (
-        <span className="chiffres shrink-0 text-sm" style={{ color: 'var(--texte-doux)' }}>
+        <span className="chiffres shrink-0 text-sm font-medium" style={{ color: 'var(--texte-doux)' }}>
           {valeur}
         </span>
       )}
       {trailing}
       {chevron && (
-        <ChevronRight size={17} strokeWidth={2} style={{ color: 'var(--texte-tres-doux)' }} />
+        <ChevronRight
+          size={17}
+          strokeWidth={2}
+          className="shrink-0 transition-transform duration-150 group-hover:translate-x-0.5"
+          style={{ color: 'var(--texte-tres-doux)' }}
+        />
       )}
     </Comp>
   )
@@ -134,7 +143,7 @@ export function ValeurNombre({ valeur, onValider, unite, min = 0 }) {
   }
 
   return (
-    <span className="flex shrink-0 items-baseline gap-1">
+    <span className="flex shrink-0 items-baseline gap-1.5">
       <input
         inputMode="decimal"
         value={brouillon}
@@ -145,11 +154,11 @@ export function ValeurNombre({ valeur, onValider, unite, min = 0 }) {
         }}
         onBlur={valider}
         onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-        className="chiffres w-16 rounded-md bg-transparent py-0.5 text-right text-sm outline-none focus:bg-[var(--surface-doux)]"
+        className="chiffres w-20 rounded-[10px] bg-[var(--surface-doux)] px-2 py-1 text-right text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-[var(--accent)]"
         style={{ color: 'var(--texte)' }}
       />
       {unite && (
-        <span className="text-xs" style={{ color: 'var(--texte-doux)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--texte-doux)' }}>
           {unite}
         </span>
       )}
@@ -180,25 +189,32 @@ export function ValeurTexte({ valeur, onValider, placeholder }) {
         if (brouillon !== valeur) onValider(brouillon)
       }}
       onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-      className="w-36 shrink-0 rounded-md bg-transparent py-0.5 text-right text-sm outline-none focus:bg-[var(--surface-doux)]"
+      className="w-40 shrink-0 rounded-[10px] bg-[var(--surface-doux)] px-2.5 py-1 text-right text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-[var(--accent)]"
       style={{ color: 'var(--texte)' }}
     />
   )
 }
 
-/** Interrupteur — partage entre les lignes et les cartes de reglages. */
+/** Interrupteur — Apple-style toggle switch avec courbe de ressort Emil Kowalski. */
 export function Interrupteur({ actif, onChange }) {
   return (
     <button
       role="switch"
       aria-checked={actif}
       onClick={() => onChange(!actif)}
-      className="relative h-7 w-12 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-      style={{ background: actif ? 'var(--accent)' : 'var(--gris-data)' }}
+      className="tactile-press relative h-7 w-12 shrink-0 rounded-full transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+      style={{
+        background: actif ? 'var(--accent)' : 'var(--gris-data)',
+        boxShadow: actif ? '0 2px 8px rgba(38, 114, 221, 0.35)' : 'none',
+      }}
     >
       <span
-        className="absolute top-1 size-5 rounded-full transition-all"
-        style={{ background: '#FFFFFF', left: actif ? 26 : 4 }}
+        className="absolute top-1 size-5 rounded-full shadow-sm transition-all duration-200"
+        style={{
+          background: '#FFFFFF',
+          left: actif ? 26 : 4,
+          transitionTimingFunction: 'var(--transition-ui)',
+        }}
       />
     </button>
   )

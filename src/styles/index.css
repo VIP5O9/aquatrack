@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/readex-pro';
 @import './tokens.css';
+@import '../App.css';
 
 /* ===========================================================================
-   Base
+   Base & Typographie Apple Human Interface Guidelines
    =========================================================================== */
 
 *,
@@ -14,6 +15,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -25,8 +27,9 @@ body {
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Aucun rebond horizontal : la maquette est une colonne verticale. */
+  /* Aucun rebond horizontal : la maquette est une colonne verticale fluide. */
   overflow-x: hidden;
+  transition: background-color 0.25s var(--transition-ui), color 0.25s var(--transition-ui);
 }
 
 button {
@@ -35,62 +38,119 @@ button {
   background: none;
   border: 0;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input,
-select {
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
 
-/* Les montants doivent s'aligner verticalement d'une ligne a l'autre.
-   Applique globalement : dans cette app, presque tous les chiffres sont
-   des montants ou des quantites. */
+/* Les montants s'alignent au pixel grâce aux chiffres tabulaires Apple */
 input[inputmode='numeric'],
 .chiffres {
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on, 'cv01' on;
 }
 
 /* ===========================================================================
-   Utilitaires de composition
+   Système de Surfaces & Verre Translucide (Apple Fluid Glass)
    =========================================================================== */
 
-/* Carte : le motif de base de toute la maquette.
-   `min-width: 0` est indispensable : les enfants de grid et de flex ont par
-   defaut `min-width: auto` et refusent de se comprimer sous la largeur
-   intrinseque de leur contenu — un graphique ou un long libelle fait alors
-   deborder toute la page horizontalement sur un petit ecran. */
+/* Carte standard à profondeur multi-niveaux et bordure optique */
 .carte {
   min-width: 0;
   background: var(--surface);
   border-radius: var(--radius-carte);
   padding: var(--padding-carte);
-  box-shadow: var(--ombre-carte);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light), var(--ombre-carte);
+  transition: transform 0.18s var(--transition-ui),
+              box-shadow 0.18s var(--transition-ui),
+              border-color 0.18s var(--transition-ui);
 }
 
-/* Meme raison, pour les colonnes qui portent les cartes. */
+/* Carte élevée pour modales, popovers et cartes prioritaires */
+.carte-elevated,
+.carte-elevee {
+  min-width: 0;
+  background: var(--surface-elevated);
+  border-radius: var(--radius-carte);
+  padding: var(--padding-carte);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light-elevated), var(--ombre-elevated);
+  transition: transform 0.18s var(--transition-ui),
+              box-shadow 0.18s var(--transition-ui);
+}
+
+/* Carte Hero & Dégradés Aqua d'impact */
+.carte-noire {
+  background: var(--hero-gradient);
+  color: var(--sur-hero);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.28), var(--ombre-flottant);
+}
+
+.carte-bleue {
+  background: var(--hero-gradient);
+  color: var(--sur-hero);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.32), var(--ombre-flottant);
+}
+
+.carte-hero {
+  background: var(--hero-gradient);
+  color: var(--sur-hero);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.30), var(--ombre-flottant), var(--lueur-hero);
+}
+
+/* Utilitaires Glassmorphism Universels (R1) */
+.effet-verre,
+.glass-panel {
+  background: var(--glass-material);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light), var(--ombre-carte);
+}
+
+.effet-verre-subtil,
+.glass-panel-subtle {
+  background: var(--glass-material-subtil);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light-subtle);
+}
+
+.effet-verre-elevated,
+.glass-panel-elevated {
+  background: var(--glass-material-elevated);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--rim-light-elevated), var(--ombre-elevated);
+}
+
+/* Colonnes & conteneurs flex/grid */
 .colonne {
   min-width: 0;
 }
 
-.carte-noire {
-  background: var(--hero);
-  color: var(--sur-hero);
-}
+/* ===========================================================================
+   Typographie & Hiérarchie d'Échelle
+   =========================================================================== */
 
-.carte-bleue {
-  background: var(--accent);
-  color: var(--sur-hero);
-}
-
-/* Grand chiffre : 34px, graisse moyenne, interlettrage resserre.
-   Repris tel quel de « 1842 » / « $85.742 » dans all_screen.png. */
 .chiffre-hero {
   font-size: 34px;
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on;
 }
 
 .chiffre-stat {
@@ -99,6 +159,7 @@ input[inputmode='numeric'],
   letter-spacing: -0.02em;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on;
 }
 
 .titre-ecran {
@@ -118,148 +179,160 @@ input[inputmode='numeric'],
 }
 
 .carte-noire .sous-ligne,
-.carte-bleue .sous-ligne {
+.carte-bleue .sous-ligne,
+.carte-hero .sous-ligne {
   color: var(--sur-hero-doux);
 }
 
-/* Zone tactile confortable : la saisie se fait debout, au comptoir. */
+/* Zone tactile confortable Apple HIG (44x44px minimum) */
 .cible-tactile {
   min-height: 44px;
   min-width: 44px;
 }
 
-/* Masque la barre de defilement des rangees de pilules horizontales,
-   sans empecher le defilement lui-meme. */
+/* Défilement horizontal sans ascenseur parasite */
 .defile-x {
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
 }
 .defile-x::-webkit-scrollbar {
   display: none;
 }
 
 /* ===========================================================================
-   Animations
+   Animations & Dynamique Emil Kowalski (Spring Physics)
    =========================================================================== */
 
 @keyframes apparition {
   from {
     opacity: 0;
   }
-}
-
-/* La feuille monte du bas sur mobile. Sur desktop elle est centree : la
-   translation reste discrete pour ne pas donner l'impression d'un glissement
-   depuis le bord de l'ecran. */
-@keyframes montee {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
+  to {
+    opacity: 1;
   }
 }
 
-/* Changement d'ecran.
-   Volontairement bref et discret : on est dans une tache, pas au spectacle.
-   Une remontee de 8px suffit a dire « nouvelle page » ; au-dela, on attend.
-   Pas de `both` en remplissage — l'etat naturel de la vue reste visible si
-   l'animation ne se joue pas. */
+@keyframes montee {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes vue-entree {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Entree d'un element de liste ou d'une carte.
-   Legere remontee + fondu. Combinee a un delai croissant (--i), elle donne le
-   rythme d'une liste qui se pose, sans jamais retenir la lecture : le decalage
-   par element est minuscule et plafonne vite. */
 @keyframes liste-entree {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+@keyframes echelle-entree {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulsation-douce {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes secousse {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-6px);
+  }
+  40%, 80% {
+    transform: translateX(6px);
+  }
+}
+
+/* Stagger fluide pour listes et flux chronologiques */
 .anim-liste > * {
-  animation: liste-entree 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
-  /* --i, pose par chaque element, echelonne l'entree. Plafonne cote JS. */
-  animation-delay: calc(var(--i, 0) * 28ms);
+  animation: liste-entree 0.32s var(--transition-ui) both;
+  animation-delay: calc(var(--i, 0) * 24ms);
 }
 
-/* Cascade des cartes d'une page. Le decalage est fixe par nth-child (pas de
-   --i a poser sur chaque carte), et plafonne vite pour ne pas faire attendre
-   le bas de page. */
+/* Cascade des cartes de dashboard */
 .anim-cartes > * {
-  animation: liste-entree 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: liste-entree 0.34s var(--transition-ui) both;
 }
-.anim-cartes > *:nth-child(2) {
-  animation-delay: 45ms;
-}
-.anim-cartes > *:nth-child(3) {
-  animation-delay: 90ms;
-}
-.anim-cartes > *:nth-child(4) {
-  animation-delay: 135ms;
-}
-.anim-cartes > *:nth-child(5) {
-  animation-delay: 180ms;
-}
-.anim-cartes > *:nth-child(n + 6) {
-  animation-delay: 215ms;
+.anim-cartes > *:nth-child(1) { animation-delay: 0ms; }
+.anim-cartes > *:nth-child(2) { animation-delay: 40ms; }
+.anim-cartes > *:nth-child(3) { animation-delay: 80ms; }
+.anim-cartes > *:nth-child(4) { animation-delay: 120ms; }
+.anim-cartes > *:nth-child(5) { animation-delay: 160ms; }
+.anim-cartes > *:nth-child(n + 6) { animation-delay: 200ms; }
+
+/* Entrée de vue globale */
+.anim-vue {
+  animation: vue-entree 0.24s var(--transition-ui) both;
 }
 
-/* Cases du calendrier : creux au repos, elles se soulevent au survol pour
-   inviter le clic. Le `transform`/`box-shadow` reste sur la case seule (pas
-   de repaint du voisinage), et l'appui l'enfonce legerement.
-   Le survol est reserve aux vrais pointeurs — sur tactile, `:active` suffit et
-   un etat de survol « colle » apres le tap serait deroutant. */
+/* Cases de calendrier interactives avec feedback tactile instantané */
 .case-cal {
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
+  transition: transform 0.15s var(--transition-ui),
+              box-shadow 0.15s var(--transition-ui),
+              background 0.15s var(--transition-ui),
+              border-color 0.15s var(--transition-ui);
+  will-change: transform;
 }
+
 .case-cal:active {
   transform: scale(0.95);
 }
+
 @media (hover: hover) {
   .case-cal:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     outline: 1.5px solid var(--accent);
     outline-offset: -1.5px;
     z-index: 1;
   }
 }
 
-/* Reglages : le texte discret y est plus dense qu'ailleurs (notes d'aide,
-   intertitres, sous-titres empiles). A 50 % d'encre il tombait a 3,2:1 sur le
-   fond clair — sous le seuil AA. On remonte le jeton LOCALEMENT, pour ce seul
-   ecran et le seul theme clair : le sombre passe deja (5,3:1), et les autres
-   ecrans, moins charges, ne sont pas touches. Les proprietes custom heritant,
-   tout `var(--texte-doux)` sous `.reglages` se corrige d'un coup. */
+/* Réglages : contraste renforcé pour texte dense */
 :root:not([data-theme='dark']) .reglages {
-  --texte-doux: rgb(34 32 38 / 0.64); /* 3,2:1 → 4,6:1 */
-  --texte-tres-doux: rgb(34 32 38 / 0.5); /* chevrons, corbeille : ~3:1 */
+  --texte-doux: rgb(25 24 29 / 0.68);
+  --texte-tres-doux: rgb(25 24 29 / 0.52);
 }
 
-/* Code faux : une secousse breve dit « recommencez » sans texte a lire. */
-@keyframes secousse {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-7px);
-  }
-  75% {
-    transform: translateX(7px);
-  }
-}
-
-/* Respecte les utilisateurs qui reduisent les animations. */
+/* Respect scrupuleux des préférences de réduction de mouvement */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

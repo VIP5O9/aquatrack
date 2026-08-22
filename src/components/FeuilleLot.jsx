@@ -51,13 +51,17 @@ export default function FeuilleLot({ lotId }) {
       <div className="flex flex-col gap-5 pb-4">
         {/* --- Ce qui reste en poche ------------------------------------- */}
         <section
-          className="rounded-[16px] p-4"
-          style={{ background: 'var(--hero)', color: 'var(--sur-hero)' }}
+          className="rounded-[20px] border border-white/15 p-5 shadow-lg"
+          style={{
+            background: 'var(--hero-gradient)',
+            color: 'var(--sur-hero)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.28), var(--ombre-flottant)',
+          }}
         >
-          <p className="text-[13px]" style={{ color: 'var(--sur-hero-doux)' }}>
+          <p className="text-[13px] font-medium" style={{ color: 'var(--sur-hero-doux)' }}>
             {lot.vendus > 0 ? 'Bénéfice net de cette livraison' : 'Pas encore entamé'}
           </p>
-          <p className="chiffre-hero mt-1">
+          <p className="chiffre-hero mt-1.5 font-medium tracking-tight" style={{ color: '#ffffff' }}>
             {lot.vendus > 0 ? formatHTG(lot.beneficeNet) : '—'}
           </p>
           {lot.vendus > 0 && (
@@ -68,18 +72,19 @@ export default function FeuilleLot({ lotId }) {
           )}
 
           <div
-            className="mt-4 h-2 w-full overflow-hidden rounded-full"
-            style={{ background: 'var(--sur-hero-faible)' }}
+            className="mt-4 h-2.5 w-full overflow-hidden rounded-full p-0.5"
+            style={{ background: 'rgba(255, 255, 255, 0.2)' }}
           >
             <div
-              className="h-full rounded-full"
+              className="h-full rounded-full transition-all duration-300"
               style={{
                 width: `${Math.min(100, pourcent)}%`,
-                background: enCours ? 'var(--accent)' : 'var(--sur-hero)',
+                background: enCours ? 'var(--cyan)' : '#ffffff',
+                boxShadow: enCours ? '0 0 10px rgba(6, 182, 212, 0.6)' : 'none',
               }}
             />
           </div>
-          <p className="mt-2 text-xs" style={{ color: 'var(--sur-hero-doux)' }}>
+          <p className="mt-2 text-xs font-medium" style={{ color: 'var(--sur-hero-doux)' }}>
             {pourcent} % écoulé
             {lot.restant > 1 && ` · ${formatGallons(lot.restant)} encore en citerne`}
             {lot.jours != null && ` · ${lot.jours} jours`}
@@ -215,8 +220,8 @@ function Ligne({ icone: Icone, couleur, libelle, detail, montant, onClick }) {
   return (
     <Element
       onClick={onClick}
-      className={`flex w-full items-center gap-3 py-2 text-left ${
-        onClick ? 'transition-opacity active:opacity-60' : ''
+      className={`flex w-full items-center gap-3.5 rounded-[12px] px-2 py-2.5 text-left transition-colors ${
+        onClick ? 'tactile-press-subtil hover:bg-[var(--surface-doux)] active:bg-[var(--surface-doux)]' : ''
       }`}
     >
       <span
@@ -224,17 +229,17 @@ function Ligne({ icone: Icone, couleur, libelle, detail, montant, onClick }) {
         className="grid size-9 shrink-0 place-items-center rounded-[10px]"
         style={{ background: `${couleur}22`, color: couleur }}
       >
-        <Icone size={16} strokeWidth={1.75} />
+        <Icone size={16} strokeWidth={1.8} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm">{libelle}</span>
+        <span className="block truncate text-sm font-medium">{libelle}</span>
         <span className="sous-ligne block truncate">{detail}</span>
       </span>
       <span className="chiffres shrink-0 text-sm font-medium">
         {formatHTG(montant, { signe: true })}
       </span>
       {onClick && (
-        <Pencil size={13} strokeWidth={1.75} style={{ color: 'var(--texte-tres-doux)' }} />
+        <Pencil size={13} strokeWidth={1.8} style={{ color: 'var(--texte-tres-doux)' }} />
       )}
     </Element>
   )

@@ -210,13 +210,19 @@ export default function FeuilleCloture({ dateInitiale }) {
             envie d'ouvrir l'app le lendemain. */}
         {beneficeJour != null && (
           <div
-            className="flex items-baseline justify-between rounded-[16px] px-4 py-3"
-            style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
+            className="flex items-baseline justify-between rounded-[18px] border border-white/15 px-4 py-3.5 shadow-sm"
+            style={{
+              background: 'var(--hero-gradient)',
+              color: 'var(--sur-hero)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), var(--ombre-carte)',
+            }}
           >
-            <span className="text-[13px]" style={{ color: 'var(--sur-hero-doux)' }}>
-              Bénéfice du jour
+            <span className="text-[13px] font-medium" style={{ color: 'var(--sur-hero-doux)' }}>
+              Bénéfice du jour estimé
             </span>
-            <span className="chiffres text-lg font-medium">{formatHTG(beneficeJour)}</span>
+            <span className="chiffres text-xl font-medium tracking-tight" style={{ color: '#ffffff' }}>
+              {formatHTG(beneficeJour)}
+            </span>
           </div>
         )}
 

@@ -39,19 +39,20 @@ export default function FeuillePeriode() {
           return (
             <li key={cle}>
               <button
+                type="button"
                 onClick={() => {
                   choisirPeriode(cle)
                   fermerFeuille()
                 }}
-                className="flex w-full items-center justify-between rounded-[14px] px-4 py-3.5 text-left text-sm transition-transform active:scale-[0.99]"
+                className="tactile-press flex w-full items-center justify-between rounded-[16px] border border-[var(--border-subtle)] px-4 py-3.5 text-left text-sm font-medium transition-all"
                 style={{
                   background: actif ? 'var(--action)' : 'var(--surface-doux)',
                   color: actif ? 'var(--sur-action)' : 'var(--texte)',
-                  fontWeight: actif ? 500 : 400,
+                  boxShadow: actif ? 'var(--ombre-carte)' : 'var(--rim-light-subtle)',
                 }}
               >
-                {libelle}
-                {actif && <Check size={17} strokeWidth={2.25} />}
+                <span>{libelle}</span>
+                {actif && <Check size={18} strokeWidth={2.5} />}
               </button>
             </li>
           )

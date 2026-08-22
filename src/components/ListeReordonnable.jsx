@@ -122,15 +122,17 @@ export default function ListeReordonnable({ items, onReordonner, cle = (i) => i.
             style={{
               transform: `translateY(${decalage(i)}px)`,
               // Aucune transition sur l'element traine : il doit coller au
-              // doigt. Les autres glissent doucement a leur nouvelle place.
-              transition: traine && !actif ? 'transform .16s ease-out' : actif ? 'none' : undefined,
+              // doigt. Les autres glissent doucement a leur nouvelle place avec le ressort Kowalski.
+              transition: traine && !actif ? 'transform 0.22s var(--transition-ui)' : actif ? 'none' : undefined,
               zIndex: actif ? 10 : undefined,
               position: 'relative',
-              opacity: actif ? 0.92 : 1,
-              boxShadow: actif ? 'var(--ombre-flottant)' : undefined,
-              borderRadius: actif ? 12 : undefined,
-              background: actif ? 'var(--surface)' : undefined,
+              opacity: actif ? 0.95 : 1,
+              boxShadow: actif ? 'var(--ombre-flottant), var(--rim-light-elevated)' : undefined,
+              border: actif ? '1px solid var(--border-subtle)' : undefined,
+              borderRadius: actif ? 14 : undefined,
+              background: actif ? 'var(--surface-elevated)' : undefined,
               cursor: actif ? 'grabbing' : undefined,
+              willChange: 'transform',
             }}
           >
             {children(item, {

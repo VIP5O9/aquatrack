@@ -6,15 +6,15 @@ import { formatHTG } from '../lib/format.js'
 import * as M from '../lib/metrics.js'
 
 /**
- * Comparaison des revenus entre deux periodes CHOISIES.
+ * Comparaison des revenus entre deux périodes CHOISIES.
  *
- * On ne compare plus seulement « ce mois vs le mois dernier » : chaque cote a
- * son propre selecteur, pour confronter deux mois — ou deux annees — au choix.
+ * On ne compare plus seulement « ce mois vs le mois dernier » : chaque côté a
+ * son propre sélecteur, pour confronter deux mois — ou deux années — au choix.
  *
- * Le parti pris qui rend la comparaison honnete tient toujours : « À MÊME
- * DATE ». Des qu'un des deux cotes est la periode EN COURS — forcement
- * partielle —, on arrete l'autre au meme quantieme (voir `comparerMois`).
- * Deux periodes passees completes, elles, se comparent en entier.
+ * Le parti pris qui rend la comparaison honnête tient toujours : « À MÊME
+ * DATE ». Dès qu'un des deux côtés est la période EN COURS — forcément
+ * partielle —, on arrête l'autre au même quantième (voir `comparerMois`).
+ * Deux périodes passées complètes, elles, se comparent en entier.
  */
 const MODES = [
   { valeur: 'mois', libelle: 'Mois' },
@@ -33,12 +33,12 @@ const MOIS_LONG = [
 const idxMois = (annee, mois) => annee * 12 + mois
 const depuisIdx = (i) => ({ annee: Math.floor(i / 12), mois: ((i % 12) + 12) % 12 })
 
-export default function ComparaisonRevenus({ etat }) {
+export default function ComparaisonRevenus({ etat, className = '' }) {
   const [mode, setMode] = useState('mois')
   const maintenant = new Date()
 
-  // Bornes : on ne remonte pas avant la premiere donnee, et on ne descend
-  // jamais dans le futur — comparer avec un mois pas encore commence n'a
+  // Bornes : on ne remonte pas avant la première donnée, et on ne descend
+  // jamais dans le futur — comparer avec un mois pas encore commencé n'a
   // aucun sens.
   const anneeMin = useMemo(() => {
     let min = maintenant.getFullYear()
@@ -76,10 +76,10 @@ export default function ComparaisonRevenus({ etat }) {
   const libelleB = enMois ? `${MOIS_LONG[bMois.mois]} ${bMois.annee}` : String(bAnnee)
 
   return (
-    <section className="carte">
+    <section className={`carte ${className}`}>
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="titre-carte">Comparaison</h2>
+          <h2 className="titre-carte font-medium tracking-tight">Comparaison</h2>
           <p className="sous-ligne mt-0.5">
             Revenus · {res.tronque ? 'à même date' : 'périodes complètes'}
           </p>
@@ -144,14 +144,16 @@ export default function ComparaisonRevenus({ etat }) {
         />
       </div>
 
-      <p className="sous-ligne mt-4 flex flex-wrap items-center gap-1.5">
+      <p className="sous-ligne mt-4 flex flex-wrap items-center gap-1.5 text-xs">
         {delta == null ? (
           `Aucun revenu en ${libelleB} pour comparer.`
         ) : (
           <>
             <Delta valeur={delta} />
-            {delta >= 0 ? 'de plus' : 'de moins'} qu’en {libelleB}
-            {res.tronque ? ', à même date' : ''}.
+            <span>
+              {delta >= 0 ? 'de plus' : 'de moins'} qu’en {libelleB}
+              {res.tronque ? ', à même date' : ''}.
+            </span>
           </>
         )}
       </p>
@@ -160,8 +162,8 @@ export default function ComparaisonRevenus({ etat }) {
 }
 
 function Ligne({ selecteur, montant, max, couleur }) {
-  // Plancher a 2 % : un tout petit revenu doit rester une barre visible, pas
-  // un trait qu'on prendrait pour zero.
+  // Plancher à 2 % : un tout petit revenu doit rester une barre visible, pas
+  // un trait qu'on prendrait pour zéro.
   const pct = montant > 0 ? Math.max(2, Math.round((montant / max) * 100)) : 0
   return (
     <div>
@@ -182,7 +184,7 @@ function Ligne({ selecteur, montant, max, couleur }) {
   )
 }
 
-/** Petit pas-a-pas ‹ étiquette › — flèches grisées aux bornes. */
+/** Petit pas-à-pas ‹ étiquette › — flèches grisées aux bornes. */
 function Stepper({ label, onMoins, onPlus, debutAtteint, finAtteinte }) {
   return (
     <div className="inline-flex items-center gap-0.5">
@@ -205,13 +207,15 @@ function Stepper({ label, onMoins, onPlus, debutAtteint, finAtteinte }) {
 function Fleche({ onClick, desactive, label, children }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={desactive}
       aria-label={label}
-      className="grid size-7 shrink-0 place-items-center rounded-full transition-opacity disabled:opacity-30"
+      className="tactile-press grid size-7 shrink-0 place-items-center rounded-full transition-all duration-150 active:scale-90 disabled:opacity-30"
       style={{ background: 'var(--surface-doux)', color: 'var(--texte-doux)' }}
     >
       {children}
     </button>
   )
 }
+

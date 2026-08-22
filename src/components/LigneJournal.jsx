@@ -7,15 +7,15 @@ import { useSombre } from '../store/useStore.js'
 
 /**
  * Ligne du journal — motif « Top products » de all_screen.png : vignette
- * arrondie a gauche, libelle et sous-ligne au centre, montant a droite.
+ * arrondie à gauche, libellé et sous-ligne au centre, montant à droite.
  *
  * Deux natures de ligne :
- *   - une cloture de journee (revenu)
- *   - une depense (reapprovisionnement ou materiel)
+ *   - une clôture de journée (revenu)
+ *   - une dépense (réapprovisionnement ou matériel)
  *
  * Le badge vert « Revenu » est la seule couleur hors planche de branding.
- * Les depenses restent en noir sur gris : introduire du rouge casserait
- * l'identite visuelle pour une information que le signe « − » porte deja.
+ * Les dépenses restent en noir sur gris : introduire du rouge casserait
+ * l'identité visuelle pour une information que le signe « − » porte déjà.
  */
 export default function LigneJournal({ ligne, onClick, masque = false }) {
   const revenu = ligne.type === 'revenu'
@@ -25,46 +25,51 @@ export default function LigneJournal({ ligne, onClick, masque = false }) {
 
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 py-2.5 text-left transition-opacity active:opacity-60"
+      className="tactile-press group flex w-full items-center gap-3 py-2.5 text-left transition-all duration-150 active:scale-[0.98]"
     >
       <span
         aria-hidden="true"
-        className="grid size-11 shrink-0 place-items-center rounded-[12px]"
+        className="grid size-11 shrink-0 place-items-center rounded-[14px] transition-transform duration-150 group-hover:scale-105"
         style={{
           background: revenu ? 'var(--surface-doux)' : `${couleur}22`,
           color: revenu ? 'var(--texte)' : couleur,
+          boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
         }}
       >
         <Icone size={19} strokeWidth={1.75} />
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{ligne.libelle}</span>
-        <span className="sous-ligne flex min-w-0 items-center gap-1.5">
-          {/* Trombone : dit d'un coup d'oeil quelles dépenses sont justifiées
+        <span className="block truncate text-sm font-medium tracking-tight">{ligne.libelle}</span>
+        <span className="sous-ligne flex min-w-0 items-center gap-1.5 text-xs">
+          {/* Trombone : dit d'un coup d'œil quelles dépenses sont justifiées
               par un reçu, sans avoir à ouvrir chaque ligne. */}
           {ligne.nbRecus > 0 && (
-            <span className="inline-flex shrink-0 items-center gap-0.5">
+            <span
+              className="inline-flex shrink-0 items-center gap-0.5 rounded px-1 py-0.2 bg-[var(--surface-doux)] text-[11px]"
+              style={{ color: 'var(--texte-doux)' }}
+            >
               <Paperclip size={11} strokeWidth={2} />
-              {ligne.nbRecus > 1 && ligne.nbRecus}
+              {ligne.nbRecus > 1 && <span>{ligne.nbRecus}</span>}
             </span>
           )}
           <span className="min-w-0 truncate">{ligne.detail}</span>
           {/* Qui a saisi : reste visible (shrink-0) pendant que le détail se
               tronque — c'est l'info de responsabilité, pas un ornement. */}
           {ligne.auteur && (
-            <span className="shrink-0 whitespace-nowrap">· {ligne.auteur}</span>
+            <span className="shrink-0 whitespace-nowrap opacity-80">· {ligne.auteur}</span>
           )}
         </span>
       </span>
 
       <span className="shrink-0 text-right">
-        <span className="chiffres block text-sm font-medium">
+        <span className="chiffres block text-sm font-medium tracking-tight">
           {masque ? MONTANT_MASQUE : formatHTG(revenu ? ligne.montant : -ligne.montant, { signe: true })}
         </span>
         <span
-          className="mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium"
+          className="mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors"
           style={
             revenu
               ? { background: 'var(--vert-clair)', color: 'var(--vert)' }

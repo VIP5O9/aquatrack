@@ -1,24 +1,15 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import InfoBulle from './InfoBulle.jsx'
 import { formatPrix, formatDateAxe, formatDateCourte, formatGallons } from '../lib/format.js'
 
 /**
- * Evolution du prix d'approvisionnement.
- *
- * Trace EN ESCALIER (`stepAfter`), et c'est le point important : entre deux
- * livraisons, le prix ne bouge pas. Une courbe lissee dessinerait une
- * progression continue qui n'a jamais eu lieu — elle mentirait sur la donnee.
- * L'escalier montre exactement ce qui s'est passe : un palier, puis un saut
- * le jour ou la compagnie a change son tarif.
- *
- * Chaque livraison porte un point visible : ce sont les seuls moments ou une
- * decision a ete prise.
+ * Évolution du prix d'approvisionnement — tracé en escalier (stepAfter).
+ * Rendu haute fidélité avec infobulle frosted glass (flou 16px),
+ * points de livraison lumineux et échelle optimisée.
  */
-export default function GraphePrixAppro({ historique, hauteur = 150 }) {
+export default function GraphePrixAppro({ historique, hauteur = 160 }) {
   if (!historique?.length) return null
 
-  // Un seul achat ne fait pas une courbe : on double le point pour tracer un
-  // palier lisible plutot qu'un point isole au milieu du vide.
+  // Un seul achat ne fait pas une courbe : on double le point pour tracer un palier lisible.
   const donnees =
     historique.length === 1
       ? [historique[0], { ...historique[0], date: historique[0].date + ' ' }]
@@ -31,10 +22,16 @@ export default function GraphePrixAppro({ historique, hauteur = 150 }) {
   const reperes = donnees.filter((_, i) => i % pas === 0).map((d) => d.date)
 
   return (
-    <div style={{ height: hauteur }}>
+    <div style={{ height: hauteur }} className="w-full relative select-none">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={donnees} margin={{ top: 10, right: 8, bottom: 0, left: 8 }}>
-          <CartesianGrid vertical horizontal={false} stroke="var(--bordure)" strokeDasharray="2 4" />
+        <LineChart data={donnees} margin={{ top: 12, right: 8, bottom: 0, left: 8 }}>
+          <CartesianGrid
+            vertical
+            horizontal={false}
+            stroke="var(--bordure)"
+            strokeDasharray="3 4"
+            opacity={0.7}
+          />
 
           <XAxis
             dataKey="date"
@@ -43,25 +40,44 @@ export default function GraphePrixAppro({ historique, hauteur = 150 }) {
             tick={{ fontSize: 11, fill: encre }}
             axisLine={false}
             tickLine={false}
-            minTickGap={12}
+            minTickGap={14}
           />
-          {/* Echelle resserree autour des valeurs : sur des prix de 7 a 8 HTG,
-              partir de zero ecraserait la variation qu'on cherche a montrer.
-              Legitime ici — c'est une serie de prix, pas des barres de volume. */}
+
+          {/* Échelle resserrée pour faire ressortir les variations de prix par gallon */}
           <YAxis hide domain={['dataMin - 0.5', 'dataMax + 0.5']} />
 
           <Tooltip
-            cursor={{ stroke: trait, strokeWidth: 1, strokeDasharray: '3 3' }}
+            cursor={{ stroke: trait, strokeWidth: 1.2, strokeDasharray: '3 3', opacity: 0.7 }}
             content={({ active, payload }) => {
               const p = payload?.[0]?.payload
+              if (!active || !p) return null
               return (
-                <InfoBulle
-                  actif={active}
-                  contenu={
-                    p &&
-                    `${formatDateCourte(p.date.trim())} · ${formatPrix(p.coutGallon)}/gallon · ${formatGallons(p.gallons)}`
-                  }
-                />
+                <div
+                  className="pointer-events-none rounded-xl px-3 py-2 text-xs font-medium whitespace-nowrap shadow-lg border"
+                  style={{
+                    background: 'var(--glass-material-elevated)',
+                    color: 'var(--texte)',
+                    backdropFilter: 'blur(16px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                    borderColor: 'var(--border-subtle)',
+                    boxShadow: 'var(--ombre-flottant)',
+                  }}
+                >
+                  <span className="text-[11px] opacity-75 block mb-0.5">
+                    {formatDateCourte(p.date.trim())}
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm font-semibold chiffres" style={{ color: 'var(--accent)' }}>
+                      {formatPrix(p.coutGallon)}
+                    </span>
+                    <span className="text-[11px] text-[var(--texte-doux)]">/gallon</span>
+                  </div>
+                  {p.gallons && (
+                    <span className="text-[11px] opacity-75 block mt-0.5">
+                      Volume : {formatGallons(p.gallons)}
+                    </span>
+                  )}
+                </div>
               )
             }}
           />
@@ -70,9 +86,19 @@ export default function GraphePrixAppro({ historique, hauteur = 150 }) {
             type="stepAfter"
             dataKey="coutGallon"
             stroke={trait}
-            strokeWidth={2}
-            dot={{ r: 3.5, fill: trait, strokeWidth: 2, stroke: '#FFFFFF' }}
-            activeDot={{ r: 5, strokeWidth: 2, stroke: '#FFFFFF' }}
+            strokeWidth={2.5}
+            dot={{
+              r: 4,
+              fill: trait,
+              strokeWidth: 2,
+              stroke: 'var(--surface)',
+            }}
+            activeDot={{
+              r: 6,
+              strokeWidth: 2.5,
+              stroke: 'var(--surface)',
+              fill: 'var(--accent)',
+            }}
           />
         </LineChart>
       </ResponsiveContainer>

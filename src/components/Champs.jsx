@@ -23,14 +23,15 @@ export function ChampMontant({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+      <span className="mb-1.5 block text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
         {label}
       </span>
       <span
-        className="flex items-baseline gap-2 rounded-[16px] px-4 py-3"
+        className="flex items-baseline gap-2 rounded-[16px] px-4 py-3 transition-all focus-within:ring-2 focus-within:ring-[var(--accent)]"
         style={{
           background: lectureSeule ? 'transparent' : 'var(--surface-doux)',
-          border: lectureSeule ? '1px dashed var(--bordure)' : '1px solid transparent',
+          border: lectureSeule ? '1px dashed var(--border-subtle)' : '1px solid var(--border-subtle)',
+          boxShadow: lectureSeule ? 'none' : 'var(--rim-light-subtle)',
         }}
       >
         <input
@@ -44,7 +45,7 @@ export function ChampMontant({
           className="chiffre-hero w-full min-w-0 bg-transparent outline-none"
           style={{ color: lectureSeule ? 'var(--texte-doux)' : 'var(--texte)' }}
         />
-        <span className="shrink-0 text-sm" style={{ color: 'var(--texte-doux)' }}>
+        <span className="shrink-0 text-sm font-medium" style={{ color: 'var(--texte-doux)' }}>
           {unite}
         </span>
       </span>
@@ -72,14 +73,15 @@ export function ChampNombre({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+      <span className="mb-1.5 block text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
         {label}
       </span>
       <span
-        className="flex items-baseline gap-2 rounded-[16px] px-4 py-2.5"
+        className="flex items-baseline gap-2 rounded-[16px] px-4 py-2.5 transition-all focus-within:ring-2 focus-within:ring-[var(--accent)]"
         style={{
           background: lectureSeule ? 'transparent' : 'var(--surface-doux)',
-          border: lectureSeule ? '1px dashed var(--bordure)' : '1px solid transparent',
+          border: lectureSeule ? '1px dashed var(--border-subtle)' : '1px solid var(--border-subtle)',
+          boxShadow: lectureSeule ? 'none' : 'var(--rim-light-subtle)',
         }}
       >
         <input
@@ -93,11 +95,11 @@ export function ChampNombre({
           onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
           readOnly={lectureSeule}
           placeholder="0"
-          className="chiffres w-full min-w-0 bg-transparent text-lg outline-none"
+          className="chiffres w-full min-w-0 bg-transparent text-lg font-medium outline-none"
           style={{ color: lectureSeule ? 'var(--texte-doux)' : 'var(--texte)' }}
         />
         {unite && (
-          <span className="shrink-0 text-xs" style={{ color: 'var(--texte-doux)' }}>
+          <span className="shrink-0 text-xs font-medium" style={{ color: 'var(--texte-doux)' }}>
             {unite}
           </span>
         )}
@@ -158,7 +160,7 @@ export function ChampReglageNombre({ label, valeur, onValider, unite, aide, min 
 export function ChampTexte({ label, valeur, onChange, placeholder, aide }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+      <span className="mb-1.5 block text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
         {label}
       </span>
       <input
@@ -166,8 +168,8 @@ export function ChampTexte({ label, valeur, onChange, placeholder, aide }) {
         value={valeur}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-[16px] px-4 py-3 text-sm outline-none"
-        style={{ background: 'var(--surface-doux)' }}
+        className="w-full rounded-[16px] border border-[var(--border-subtle)] px-4 py-3 text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-[var(--accent)]"
+        style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
       />
       {aide && <span className="sous-ligne mt-1.5 block">{aide}</span>}
     </label>
@@ -191,7 +193,7 @@ export function ChampDate({ label = 'Date', valeur, onChange, max }) {
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <span className="text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+        <span className="text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
           {label}
         </span>
         <div className="flex gap-1.5">
@@ -201,11 +203,13 @@ export function ChampDate({ label = 'Date', valeur, onChange, max }) {
           ].map((r) => (
             <button
               key={r.cle}
+              type="button"
               onClick={() => onChange(r.cle)}
-              className="rounded-full px-2.5 py-1 text-[11px] transition-colors"
+              className="tactile-press rounded-full px-3 py-1 text-[11px] font-medium transition-all"
               style={{
                 background: valeur === r.cle ? 'var(--action)' : 'var(--surface-doux)',
                 color: valeur === r.cle ? 'var(--sur-action)' : 'var(--texte-doux)',
+                border: '1px solid var(--border-subtle)',
               }}
             >
               {r.libelle}
@@ -218,8 +222,8 @@ export function ChampDate({ label = 'Date', valeur, onChange, max }) {
         value={valeur}
         max={max}
         onChange={(e) => e.target.value && onChange(e.target.value)}
-        className="w-full rounded-[16px] px-4 py-3 text-sm outline-none"
-        style={{ background: 'var(--surface-doux)' }}
+        className="w-full rounded-[16px] border border-[var(--border-subtle)] px-4 py-3 text-sm font-medium outline-none transition-all focus:ring-2 focus:ring-[var(--accent)]"
+        style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
       />
       <span className="sous-ligne mt-1.5 block">{formatDateCourte(valeur)}</span>
     </div>
@@ -231,7 +235,7 @@ export function Pilules({ options, valeur, onChange, label }) {
   return (
     <div>
       {label && (
-        <span className="mb-1.5 block text-[13px]" style={{ color: 'var(--texte-doux)' }}>
+        <span className="mb-1.5 block text-[13px] font-medium" style={{ color: 'var(--texte-doux)' }}>
           {label}
         </span>
       )}
@@ -241,11 +245,14 @@ export function Pilules({ options, valeur, onChange, label }) {
           return (
             <button
               key={o.valeur}
+              type="button"
               onClick={() => onChange(o.valeur)}
-              className="shrink-0 rounded-full px-3.5 py-2 text-[13px] whitespace-nowrap transition-colors"
+              className="tactile-press shrink-0 rounded-full px-4 py-2 text-[13px] whitespace-nowrap transition-all"
               style={{
                 background: actif ? 'var(--action)' : 'var(--surface-doux)',
                 color: actif ? 'var(--sur-action)' : 'var(--texte-doux)',
+                border: '1px solid var(--border-subtle)',
+                boxShadow: actif ? 'var(--ombre-carte)' : 'var(--rim-light-subtle)',
                 fontWeight: actif ? 500 : 400,
               }}
             >

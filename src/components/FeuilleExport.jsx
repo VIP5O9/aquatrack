@@ -76,24 +76,29 @@ function Choix({ icone: Icone, titre, texte, onClick, occupe }) {
     <button
       onClick={onClick}
       disabled={occupe}
-      className="flex items-center gap-3.5 rounded-[16px] p-3.5 text-left transition-transform active:scale-[0.99] disabled:opacity-60"
-      style={{ background: 'var(--surface-doux)' }}
+      className="group tactile-press flex items-center gap-3.5 rounded-[18px] border border-[var(--border-subtle)] p-4 text-left shadow-sm transition-all duration-150 active:scale-[0.98] disabled:opacity-60"
+      style={{ background: 'var(--surface-doux)', boxShadow: 'var(--rim-light-subtle)' }}
     >
       <span
-        className="grid size-11 shrink-0 place-items-center rounded-[12px]"
-        style={{ background: 'var(--action)', color: 'var(--sur-action)' }}
+        className="grid size-12 shrink-0 place-items-center rounded-[14px] shadow-sm transition-transform duration-200 group-hover:scale-105"
+        style={{ background: 'var(--action)', color: 'var(--sur-action)', boxShadow: 'var(--rim-light-subtle)' }}
       >
         {occupe ? (
-          <Loader2 size={20} strokeWidth={1.75} className="animate-spin" />
+          <Loader2 size={20} strokeWidth={1.8} className="animate-spin" />
         ) : (
-          <Icone size={20} strokeWidth={1.75} />
+          <Icone size={20} strokeWidth={1.8} />
         )}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-medium">{titre}</span>
-        <span className="sous-ligne block">{texte}</span>
+        <span className="sous-ligne mt-0.5 block leading-relaxed">{texte}</span>
       </span>
-      <ChevronRight size={18} strokeWidth={1.75} style={{ color: 'var(--texte-tres-doux)' }} />
+      <ChevronRight
+        size={18}
+        strokeWidth={2}
+        className="shrink-0 transition-transform duration-150 group-hover:translate-x-0.5"
+        style={{ color: 'var(--texte-tres-doux)' }}
+      />
     </button>
   )
 }

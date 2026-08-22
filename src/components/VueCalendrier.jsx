@@ -5,19 +5,27 @@ import { formatHTG, cleJour, depuisCleJour } from '../lib/format.js'
 /**
  * Vue mensuelle du journal.
  *
- * Ce que la liste ne montre pas : les TROUS. Une journee oubliee disparait
+ * Ce que la liste ne montre pas : les TROUS. Une journée oubliée disparaît
  * simplement d'une liste chronologique, alors qu'elle saute aux yeux dans une
  * grille — c'est la case vide au milieu des autres. Sur une application dont
- * la donnee depend entierement d'une saisie quotidienne, c'est la vue la plus
- * utile pour reperer ce qui manque.
+ * la donnée dépend entièrement d'une saisie quotidienne, c'est la vue la plus
+ * utile pour repérer ce qui manque.
  *
  * Chaque case porte la recette du jour et une barre dont le remplissage est
- * relatif au meilleur jour du mois : on lit le rythme sans avoir a comparer
- * des chiffres un a un.
+ * relatif au meilleur jour du mois : on lit le rythme sans avoir à comparer
+ * des chiffres un à un.
  */
 const JOURS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
-export default function VueCalendrier({ journees, depenses, categories, annee, mois, onJour }) {
+export default function VueCalendrier({
+  journees,
+  depenses,
+  categories,
+  annee,
+  mois,
+  onJour,
+  className = '',
+}) {
   const cases = useMemo(
     () => construireGrille(journees, depenses, categories, annee, mois),
     [journees, depenses, categories, annee, mois],
@@ -27,19 +35,23 @@ export default function VueCalendrier({ journees, depenses, categories, annee, m
   const aujourdhui = cleJour()
 
   return (
-    <div>
-      <div className="mb-1.5 grid grid-cols-7 gap-1">
+    <div className={className}>
+      <div className="mb-2 grid grid-cols-7 gap-1 sm:gap-1.5">
         {JOURS.map((j) => (
-          <div key={j} className="text-center text-[10px]" style={{ color: 'var(--texte-doux)' }}>
+          <div
+            key={j}
+            className="text-center text-[11px] font-medium tracking-wide"
+            style={{ color: 'var(--texte-doux)' }}
+          >
             {j}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
         {cases.map((c, i) =>
           c === null ? (
-            <div key={`vide-${i}`} />
+            <div key={`vide-${i}`} className="aspect-square md:aspect-[4/3] lg:aspect-[2/1]" />
           ) : (
             <Case
               key={c.date}
@@ -62,19 +74,20 @@ function Case({ donnees, max, estAujourdhui, futur, onClick }) {
   const { jour, revenus, cloturee, marqueurs } = donnees
   const remplissage = revenus > 0 ? Math.max(8, (revenus / max) * 100) : 0
 
-  // Un jour a venir n'est pas « oublie » : il est simplement devant nous, et
-  // AUJOURD'HUI non plus — la journee n'est pas finie, on cloture le soir.
+  // Un jour à venir n'est pas « oublié » : il est simplement devant nous, et
+  // AUJOURD'HUI non plus — la journée n'est pas finie, on clôture le soir.
   // Les confondre avec un trou de saisie transformerait la fin de chaque mois
-  // en un mur d'alertes injustifiees.
+  // en un mur d'alertes injustifiées.
   const manquante = !cloturee && !futur && !estAujourdhui
 
   return (
     <button
+      type="button"
       onClick={onClick}
-      // Carree sur telephone, ou la largeur de colonne est deja petite ; plus
-      // basse sur grand ecran, sinon une colonne de 160px donnerait des cases
+      // Carrée sur téléphone, où la largeur de colonne est déjà petite ; plus
+      // basse sur grand écran, sinon une colonne de 160px donnerait des cases
       // de 160px de haut, vides aux trois quarts.
-      className="case-cal relative flex aspect-square flex-col justify-between overflow-hidden rounded-[10px] p-1.5 text-left md:aspect-[4/3] lg:aspect-[2/1]"
+      className="case-cal tactile-press relative flex aspect-square flex-col justify-between overflow-hidden rounded-[12px] p-1.5 text-left md:aspect-[4/3] lg:aspect-[2/1]"
       style={{
         background: cloturee ? 'var(--surface-doux)' : 'transparent',
         border: manquante
@@ -82,7 +95,8 @@ function Case({ donnees, max, estAujourdhui, futur, onClick }) {
           : estAujourdhui
             ? '1.5px solid var(--accent)'
             : '1px solid transparent',
-        opacity: futur ? 0.4 : 1,
+        boxShadow: estAujourdhui ? '0 0 10px rgba(38, 114, 221, 0.2)' : 'none',
+        opacity: futur ? 0.38 : 1,
       }}
     >
       <span className="flex items-start justify-between gap-0.5">
@@ -96,15 +110,19 @@ function Case({ donnees, max, estAujourdhui, futur, onClick }) {
           {jour}
         </span>
 
-        {/* Deux marqueurs au maximum : au-dela, une case de 45px devient
-            illisible et le calendrier perd son interet de coup d'oeil. */}
+        {/* Deux marqueurs au maximum : au-delà, une case de 45px devient
+            illisible et le calendrier perd son intérêt de coup d'œil. */}
         <span className="flex shrink-0 gap-0.5">
           {marqueurs.slice(0, 2).map((m) => (
             <span
               key={m.cle}
               title={m.titre}
-              className="grid size-[15px] place-items-center rounded-full"
-              style={{ background: `${m.couleur}26`, color: m.couleur }}
+              className="grid size-[15px] place-items-center rounded-full transition-transform"
+              style={{
+                background: `${m.couleur}26`,
+                color: m.couleur,
+                boxShadow: `0 0 4px ${m.couleur}40`,
+              }}
             >
               <m.icone size={9} strokeWidth={2.5} />
             </span>
@@ -115,7 +133,7 @@ function Case({ donnees, max, estAujourdhui, futur, onClick }) {
       {cloturee && (
         <span className="w-full">
           <span
-            className="chiffres block truncate text-[9px] leading-tight"
+            className="chiffres block truncate text-[9px] font-medium leading-tight tracking-tight"
             style={{ color: 'var(--texte)' }}
           >
             {Math.round(revenus / 1000) >= 1
@@ -123,7 +141,7 @@ function Case({ donnees, max, estAujourdhui, futur, onClick }) {
               : revenus}
           </span>
           <span
-            className="mt-0.5 block h-1 rounded-full"
+            className="mt-0.5 block h-1 rounded-full transition-[width] duration-300"
             style={{ width: `${remplissage}%`, background: 'var(--accent)' }}
           />
         </span>
@@ -135,13 +153,13 @@ function Case({ donnees, max, estAujourdhui, futur, onClick }) {
 function Legende() {
   return (
     <ul
-      className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-[11px]"
+      className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px]"
       style={{ color: 'var(--texte-doux)' }}
     >
       <li className="flex items-center gap-1.5">
         <span
           className="size-3 rounded-[4px]"
-          style={{ background: 'var(--surface-doux)' }}
+          style={{ background: 'var(--surface-doux)', border: '1px solid var(--border-subtle)' }}
           aria-hidden="true"
         />
         Journée clôturée
@@ -179,9 +197,9 @@ function PastilleLegende({ icone: Icone, couleur, libelle }) {
 /**
  * Construit la grille du mois, lundi en premier.
  *
- * Les cases `null` en tete comblent les jours de la semaine precedente : sans
+ * Les cases `null` en tête comblent les jours de la semaine précédente : sans
  * elles, le 1er du mois se placerait toujours sous « Lun » quel que soit le
- * jour reel, et toute la grille mentirait.
+ * jour réel, et toute la grille mentirait.
  */
 function construireGrille(journees, depenses, categories = [], annee, mois) {
   const premier = new Date(annee, mois, 1)
@@ -190,8 +208,8 @@ function construireGrille(journees, depenses, categories = [], annee, mois) {
 
   const parDate = new Map(journees.map((j) => [j.date, j]))
 
-  // Les depenses sont regroupees par jour, avec la nature de leur categorie :
-  // une livraison de camion et un achat de bouchons ne meritent pas le meme
+  // Les dépenses sont regroupées par jour, avec la nature de leur catégorie :
+  // une livraison de camion et un achat de bouchons ne méritent pas le même
   // signe sur le calendrier.
   const depParJour = new Map()
   for (const d of depenses) {
@@ -208,7 +226,7 @@ function construireGrille(journees, depenses, categories = [], annee, mois) {
     const ds = depParJour.get(date) ?? []
 
     // Ordre d'importance : une livraison prime sur un achat courant, qui prime
-    // sur la mention du compteur. C'est ce qui decide de ce qu'on garde quand
+    // sur la mention du compteur. C'est ce qui décide de ce qu'on garde quand
     // la place manque.
     const marqueurs = []
     if (ds.some((d) => d.appro)) {
@@ -235,3 +253,4 @@ function construireGrille(journees, depenses, categories = [], annee, mois) {
 }
 
 export { depuisCleJour }
+
